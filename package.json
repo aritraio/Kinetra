@@ -1,0 +1,21 @@
+{
+  "name": "kinetra",
+  "version": "0.0.1",
+  "private": true,
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "dev": "pnpm --filter @kinetra/web dev",
+    "lint": "echo \"Scaffold: lint command not configured yet\"",
+    "format:check": "echo \"Scaffold: format:check command not configured yet\"",
+    "typecheck": "echo \"Scaffold: typecheck command not configured yet\"",
+    "test": "echo \"Scaffold: test command not configured yet\"",
+    "test:coverage": "echo \"Scaffold: test:coverage command not configured yet\"",
+    "test:db": "echo \"Scaffold: test:db command not configured yet\"",
+    "test:e2e": "echo \"Scaffold: test:e2e command not configured yet\"",
+    "eval:fixtures": "echo \"Scaffold: eval:fixtures command not configured yet\"",
+    "eval:live": "echo \"Scaffold: eval:live command not configured yet\"",
+    "build": "echo \"Scaffold: build command not configured yet\"",
+    "db:migrate": "echo \"Scaffold: db:migrate command not configured yet\"",
+    "db:seed": "echo \"Scaffold: db:seed command not configured yet\""
+  }
+}
