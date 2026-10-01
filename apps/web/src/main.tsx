@@ -2,13 +2,19 @@ import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-quer
 import { createRootRoute, createRoute, createRouter, RouterProvider } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { AccountPanel } from './account';
 import { rpc } from './client';
+import { DemoHeader, type NavigationTab } from './components/DemoHeader';
 import { webEnvironment } from './env';
+import { MeasureView } from './features/MeasureView';
+import { PlanView } from './features/PlanView';
+import { ProgressView } from './features/ProgressView';
+import { TodayView } from './features/TodayView';
+import { RepositoryProvider } from './repositories';
 import { consumeStream } from './stream';
 import './styles.css';
-import { AccountPanel } from './account';
 
-function Foundation() {
+function FoundationPanel() {
   const echo = useQuery({
     queryKey: ['foundation'],
     queryFn: () => rpc.echo.query({ message: 'Kinetra is connected.' }),
@@ -17,7 +23,9 @@ function Foundation() {
   const [text, setText] = useState('');
   const [status, setStatus] = useState('Ready');
   const controller = useRef<AbortController | null>(null);
+
   useEffect(() => () => controller.current?.abort(), []);
+
   async function startStream() {
     controller.current?.abort();
     const active = new AbortController();
@@ -38,26 +46,22 @@ function Foundation() {
         setStatus(active.signal.aborted ? 'Cancelled' : 'Stream failed. Start again to retry.');
     }
   }
+
   return (
-    <main>
-      <header>
-        <span className="wordmark">KINETRA</span>
-        <span className="phase">PHASE 02 / SECURITY</span>
-      </header>
-      <section>
-        <p className="eyebrow">A clear starting point</p>
-        <h1>
-          Build on something
-          <br />
-          you can verify.
-        </h1>
+    <div className="foundation-panel">
+      <section className="hero-section">
+        <p className="eyebrow">DEVELOPER & AUDITOR FOUNDATION</p>
+        <h1>System Diagnostics</h1>
         <p className="intro">
-          The typed web and API foundation is ready to inspect. Fitness planning arrives in the next
-          phases.
+          Verify typed tRPC transport, local SSE streaming, and local Supabase authentication.
         </p>
       </section>
-      <section className="instrument">
-        <h2>Connection</h2>
+
+      <section className="instrument card">
+        <div className="card-header">
+          <h2>API RPC Connection</h2>
+          <span className="badge">Transport Check</span>
+        </div>
         <p role="status">
           {echo.isPending
             ? 'Connecting…'
@@ -69,10 +73,16 @@ function Foundation() {
           Check connection
         </button>
       </section>
-      <section className="instrument">
-        <h2>Stream transport</h2>
+
+      <section className="instrument card" style={{ marginTop: '20px' }}>
+        <div className="card-header">
+          <h2>Stream Transport</h2>
+          <span className="badge">SSE Verification</span>
+        </div>
         <p>This is a fixed synthetic response. It uses no AI provider or account data.</p>
-        <p role="status">{status}</p>
+        <p role="status">
+          Status: <strong>{status}</strong>
+        </p>
         <output>{text || 'Your stream will appear here.'}</output>
         <div className="actions">
           <button
@@ -91,27 +101,59 @@ function Foundation() {
           </button>
         </div>
       </section>
-      <AccountPanel />
-      <footer>
-        Verified identity · Local synthetic development · AI and photo collection disabled
-      </footer>
-    </main>
+
+      <div style={{ marginTop: '20px' }}>
+        <AccountPanel />
+      </div>
+    </div>
   );
 }
+
+function KinetraApp() {
+  // Read initial query params if present (?demo=marcus&tab=plan)
+  const query = new URLSearchParams(window.location.search);
+  const initialTab = (query.get('tab') as NavigationTab) || 'today';
+  const initialPersona = query.get('demo') === 'marcus' ? 'marcus' : 'maya';
+
+  const [activeTab, setActiveTab] = useState<NavigationTab>(initialTab);
+
+  return (
+    <RepositoryProvider initialPersona={initialPersona}>
+      <main>
+        <DemoHeader activeTab={activeTab} onSelectTab={setActiveTab} />
+
+        {activeTab === 'today' && <TodayView onNavigateToPlan={() => setActiveTab('plan')} />}
+        {activeTab === 'measure' && <MeasureView />}
+        {activeTab === 'plan' && <PlanView />}
+        {activeTab === 'progress' && <ProgressView />}
+        {activeTab === 'foundation' && <FoundationPanel />}
+
+        <footer>
+          Verified identity · Local synthetic development · AI and photo collection disabled ·
+          Domain contracts active
+        </footer>
+      </main>
+    </RepositoryProvider>
+  );
+}
+
 const rootRoute = createRootRoute();
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: Foundation,
+  component: KinetraApp,
 });
 const router = createRouter({ routeTree: rootRoute.addChildren([indexRoute]) });
+
 declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;
   }
 }
+
 const root = document.getElementById('root');
 if (!root) throw new Error('Missing application root');
+
 createRoot(root).render(
   <QueryClientProvider client={new QueryClient()}>
     <RouterProvider router={router} />

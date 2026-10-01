@@ -8,7 +8,7 @@ import ts from 'typescript';
 const builtins = new Set(builtinModules.map((name) => name.replace(/^node:/, '')));
 
 const allowed: Record<string, readonly string[]> = {
-  'apps/web': ['@kinetra/contracts'],
+  'apps/web': ['@kinetra/contracts', '@kinetra/domain'],
   'apps/api': ['@kinetra/contracts', '@kinetra/domain', '@kinetra/db'],
   'packages/contracts': [],
   'packages/domain': ['@kinetra/contracts'],

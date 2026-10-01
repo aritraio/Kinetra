@@ -107,15 +107,15 @@ Local implementation and acceptance evidence: [Phase 2 report](PHASE_2_REPORT.md
 
 **Dependencies:** Phases 1–2. **Output:** typed core, shared schemas, and an immediately usable demonstration.
 
-- [ ] **P3-01 — Define canonical schemas.** Cover profiles, logs, training sessions, meal/workout plans, coach events, and voice extraction. Bound values and lengths, reject invalid numbers/units, and version persisted payloads.
-- [ ] **P3-02 — Port or build calculations as pure functions.** Implement required energy/target/macro/unit calculations with explicit assumptions and cited policy rationale. Test boundaries and invalid inputs; distinguish estimates from measured values.
-- [ ] **P3-03 — Build a normalized ingredient/exercise catalog.** Define identifiers, units, nutrition provenance, equipment requirements, aliases, exclusions, and unknown-value handling. Record where information is estimated.
-- [ ] **P3-04 — Implement feature repository interfaces.** Support profiles, logs, plans, and history through interchangeable API and demo repositories. Do not scatter demo-specific conditions through UI components.
-- [ ] **P3-05 — Create two synthetic personas.** Include contrasting goals, at least 14 days of plausible logs, accepted plan fixtures, and training history. Clearly label data as synthetic and keep sample values out of clinical claims.
-- [ ] **P3-06 — Add demo entry and reset.** Support a documented demo URL/persona selector. Disable server writes and provider calls; reset to deterministic fixtures. Verify demo storage cannot leak into a later signed-in account.
-- [ ] **P3-07 — Publish a demo walkthrough.** Show the first useful screen immediately, then a plan and progress view. Record limitations and verify it works without auth or provider configuration.
+- [x] **P3-01 — Define canonical schemas.** Cover profiles, logs, training sessions, meal/workout plans, coach events, and voice extraction. Bound values and lengths, reject invalid numbers/units, and version persisted payloads.
+- [x] **P3-02 — Port or build calculations as pure functions.** Implement required energy/target/macro/unit calculations with explicit assumptions and cited policy rationale. Test boundaries and invalid inputs; distinguish estimates from measured values.
+- [x] **P3-03 — Build a normalized ingredient/exercise catalog.** Define identifiers, units, nutrition provenance, equipment requirements, aliases, exclusions, and unknown-value handling. Record where information is estimated.
+- [x] **P3-04 — Implement feature repository interfaces.** Support profiles, logs, plans, and history through interchangeable API and demo repositories. Do not scatter demo-specific conditions through UI components.
+- [x] **P3-05 — Create two synthetic personas.** Include contrasting goals, at least 14 days of plausible logs, accepted plan fixtures, and training history. Clearly label data as synthetic and keep sample values out of clinical claims.
+- [x] **P3-06 — Add demo entry and reset.** Support a documented demo URL/persona selector. Disable server writes and provider calls; reset to deterministic fixtures. Verify demo storage cannot leak into a later signed-in account.
+- [x] **P3-07 — Publish a demo walkthrough.** Show the first useful screen immediately, then a plan and progress view. Record limitations and verify it works without auth or provider configuration.
 
-**Exit gate:** shared contracts and calculation tests pass; both personas work reproducibly; no demo action calls paid generation or modifies account data.
+**Exit gate:** shared contracts and calculation tests pass; both personas work reproducibly; no demo action calls paid generation or modifies account data. Complete locally. See [the Phase 3 report](PHASE_3_REPORT.md).
 
 ## 7. Phase 4 — Verified AI pipeline and evaluations
 

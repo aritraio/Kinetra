@@ -17,6 +17,7 @@
     "@trpc/client": "11.19.0",
     "@kinetra/api": "workspace:*",
     "@kinetra/contracts": "workspace:*",
+    "@kinetra/domain": "workspace:*",
     "zod": "4.6.5",
     "@supabase/supabase-js": "2.117.2"
   },

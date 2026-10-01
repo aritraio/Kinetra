@@ -13,9 +13,4 @@ export function localDateAt(timestamp: string, timezone: string): string {
   const get = (type: string) => parts.find((part) => part.type === type)?.value;
   return localDateSchema.parse(`${get('year')}-${get('month')}-${get('day')}`);
 }
-export function weightInKg(value: number, unit: 'kg' | 'lb'): number {
-  if (!Number.isFinite(value) || value <= 0) throw new Error('Invalid weight');
-  const kg = unit === 'lb' ? value * 0.45359237 : value;
-  if (kg < 20 || kg > 500) throw new Error('Weight outside supported range');
-  return Math.round(kg * 1_000_000) / 1_000_000;
-}
+export { weightInKg } from './units';

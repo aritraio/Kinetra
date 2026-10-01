@@ -14,3 +14,8 @@ export const streamEventSchema = z.discriminatedUnion('type', [
 export type StreamEvent = z.infer<typeof streamEventSchema>;
 
 export * from './account';
+export * from './plans';
+export * from './sessions';
+export * from './coach';
+export * from './voice';
+export * from './repositories';

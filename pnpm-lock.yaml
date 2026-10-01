@@ -65,6 +65,9 @@ importers:
       '@kinetra/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@kinetra/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
       '@supabase/supabase-js':
         specifier: 2.117.2
         version: 2.117.2

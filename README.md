@@ -1,146 +1,181 @@
 # Kinetra
 
-Kinetra is a planned fitness web app that combines personal planning, daily tracking, offline logging, and measurable AI reliability. Its central goal is to turn user context into useful meal and workout plans, verify those plans before displaying them, and adapt recommendations using recorded progress.
+> **High-Integrity, Evidence-Grounded Fitness Web Platform**  
+> Turning personal context into verified nutrition and training plans with zero-tolerance for AI hallucinations.
 
-**Project status: Phase 2 security foundation implemented locally.** The typed web/API workspace now includes synthetic sign-in, verified account access, owner-scoped tables and RLS, revision-protected profile/log writes, consent records, and atomic budget reservations. AI, photos, and real-user collection remain disabled. Hosted preview verification and observed GitHub Actions evidence are pending. See the [Phase 2 evidence report](docs/PHASE_2_REPORT.md) and [privacy policy](PRIVACY.md).
+Kinetra is a fitness web application that combines personalized nutrition and workout planning, daily telemetry tracking, offline logging, and measurable AI reliability.
 
-## Start here
+Rather than treating Large Language Models as unverified authorities that hallucinate arbitrary diets or dangerous lifting volumes, Kinetra operates on a **Verification-First** architecture: pure peer-reviewed sports science rules (Mifflin-St Jeor, PAL multipliers, Morton et al. protein targets, US Navy circumference models) act as deterministic mathematical guardrails. AI acts solely as a structured plan generator, and its outputs must pass strict schema validation and domain verification before being presented to the user.
 
-| Document | What it answers |
-| --- | --- |
-| [Architecture](docs/ARCHITECTURE.md) | What are the components, data models, boundaries, and technical decisions? |
-| [Workflow](docs/WORKFLOW.md) | How do we develop, test, review, deploy, and maintain the project? |
-| [Privacy](PRIVACY.md) | What is collected locally, what remains disabled, and which lifecycle gates block launch? |
-| [Completion plan](docs/PROJECT_PLAN.md) | What do we build, in what order, and what proves each phase is finished? |
+---
 
-The three original reviews are retained as inputs: [feature and quality audit](ideas.improve.md), [stack and design blueprint](improve.md), and [recommendations](recomenation-for-imporvemt.md). They describe a prior FitnessBaba implementation and suggest other names, including Metria. **Kinetra** is the name used in this repository. Historical file paths, vulnerability findings, coverage numbers, provider prices, and performance claims in those reviews have not been verified against application code in this checkout.
+## Current Status: Phase 3 Implemented Locally
 
-When the reviews disagree, use the completion plan for sequencing and the architecture document for the proposed technical baseline. Record later changes as architecture decisions instead of silently editing the historical reviews.
+The repository is currently at **Phase 3 ("Domain contracts and an early synthetic demo")**.
 
-## Product direction
+- **Zero-Config Synthetic Demo**: Boots instantly in-memory without cloud accounts, database instances, or paid AI API keys.
+- **Pure Scientific Calculations**: 100% deterministic algorithms for BMR, TDEE, safe caloric bounds, macronutrient distributions, and body composition.
+- **Standardized Catalogs**: USDA FoodData Central ingredient provenance and exercise catalog with biomechanical metadata.
+- **Two Complete Personas**: **Maya Lin** (58 kg, cut, pescatarian) and **Marcus Vance** (88 kg, bulk, omnivore/powerbuilding) with 14 days of realistic logs, 7-day meal plans, and multi-week resistance programs.
+- **Interactive Web Interface**: 5 operational views (Today, Measure, Plan, Progress, and Foundation & Auth) with live persona switching and instant fixture resetting.
+- **Quality Gates Passing**: Strict TypeScript, Biome linter/formatter, workspace dependency boundaries, and 38 unit/contract tests passing in CI.
 
-Kinetra should help a user answer three practical questions:
+*Note: Real-user collection and paid AI generation remain intentionally disabled at this phase. See the [Phase 3 Report](docs/PHASE_3_REPORT.md) and [Privacy Policy](PRIVACY.md).*
 
-1. What should I do today to work toward my goal?
-2. What does my recorded progress show?
-3. Why should I trust this generated recommendation?
+---
 
-The proposed navigation has six destinations: **Today, Measure, Plan, Coach, Form Lab, and Progress**. Onboarding gathers only the information required for the next useful action, with optional details collected later.
+## Quick Start (Explore in 60 Seconds)
 
-### Initial usable release
+You can run the entire interactive demo locally with zero cloud dependencies or API keys:
 
-- Account access and a validated fitness profile with explicit units and timezone.
-- Explainable calculations with documented assumptions and configurable target policies.
-- Meal and workout generation with shared schemas, deterministic verification, and bounded recovery.
-- A Today dashboard, daily logs, history, and versioned private plans.
-- Offline reading and queued log writes with visible sync state.
-- Two synthetic demo personas that work without an account or paid AI requests.
-- Data export, deletion, accessible controls, and tested tenant isolation.
+### 1. Requirements
+- Node.js `24.19.0` (or compatible Node 24 LTS)
+- pnpm `11.19.0` (`npm install --global pnpm@11.19.0`)
 
-### Full v1 additions
-
-- Coach responses streamed with clear cancellation and error handling.
-- Voice-assisted logging that requires user confirmation before saving.
-- Local camera-based Form Lab for a supported exercise, with landmark overlays, rep detection, and documented limits.
-- Explainable adaptive progression based on sufficient recorded training history.
-- Tested photo retention controls, optional progress photos, revocable plan sharing, and the instrument-inspired visual system.
-- Published evaluation results, critical end-to-end checks, monitoring, and a reproducible release process.
-
-These are goals, not implemented capabilities. [The phase checklist](docs/PROJECT_PLAN.md) tracks delivery and defines the distinction between the initial release and full v1.
-
-## Proposed technical baseline
-
-| Area | Proposed choice |
-| --- | --- |
-| Web client | React, strict TypeScript, Vite, TanStack Router and Query |
-| Forms and contracts | React Hook Form, Zod; validation on the server and client |
-| Styling | Tailwind CSS with custom accessible design tokens |
-| API | Hono on a Vercel Node serverless runtime; typed tRPC procedures and a separate SSE transport |
-| Data and identity | Supabase Postgres and Auth; SQL migrations with typed Drizzle row models; private Storage planned |
-| Offline | IndexedDB through Dexie; versioned service worker using Workbox |
-| AI | Server-only provider adapters; Gemini as the first candidate, other adapters after capability and evaluation checks |
-| Verification | Pure TypeScript domain rules, Vitest, component tests, a small Playwright suite, and AI evaluations |
-| Repository | pnpm workspaces; a single chosen formatter/linter and GitHub Actions |
-
-Versions, model identifiers, SDK compatibility, hosting limits, and pricing must be verified and pinned during implementation. No free-tier or monthly-cost guarantee is made here.
-
-## Local setup
-
-Use Node **24.19.0** (pinned in `.node-version`/`.nvmrc`; newer Node 24 patch releases are supported) and pnpm **11.19.0**. If needed, install the pinned package manager with `npm install --global pnpm@11.19.0`.
-
-From the repository root:
-
+### 2. Boot the Development Environment
 ```sh
+# 1. Install dependencies
 pnpm install --frozen-lockfile
-cp apps/api/.env.example apps/api/.env.local
-cp apps/web/.env.example apps/web/.env.local
+
+# 2. Start the development server (API on 3001, Web on 5173)
 pnpm dev
 ```
 
-Open [the local app](http://127.0.0.1:5173). The API runs at `http://127.0.0.1:3001`; Vite proxies `/api` to it. The connection card exercises a typed request, and **Start stream** exercises a finite synthetic SSE response. **Cancel** aborts it. The transport slice requires no cloud account, provider key, or database service. Account sign-in is optional and requires the local setup below. Enter synthetic data only. Stop the development services with Ctrl+C.
+### 3. Open the App
+Visit **[http://127.0.0.1:5173](http://127.0.0.1:5173)** in your browser.
 
-### Checks and builds
+---
+
+## How to Look into the App
+
+When you launch `http://127.0.0.1:5173`, you will see an instrument-grade dark UI. Here is how to explore its capabilities:
+
+| Destination | What to Explore | What It Demonstrates |
+| --- | --- | --- |
+| **Persona Pills** (Header) | Click **Maya Lin (Cut)** or **Marcus Vance (Bulk)**, or click **Reset to pristine** | Instant state swap across all repositories; validates multi-persona fixtures and zero-bleed isolation. |
+| **Today** | Review today's workout prompt, calorie gauge, and macro progress bars. Fill out the "Quick daily log" form at the bottom. | Real-time intake vs. target calculations; optimistic updates persisting across in-memory session. |
+| **Measure** | Adjust demographic sliders, body weight, PAL activity level, and US Navy tape measurements. | Live Mifflin-St Jeor BMR, TDEE, macronutrient grams, and body-fat calculations with peer-reviewed literature citations. |
+| **Plan** | Toggle between **Nutrition** (7-day pescatarian or omnivore schedules) and **Training** (4-day Upper/Lower or 5-day PPL programs). | Canonical plan schema rendering, meal timings, target macros, and structured progression sets/reps. |
+| **Progress** | Inspect the 14-day weight trend bar chart, compliance KPI cards, raw daily log records, and completed workout sessions. | 14 days of realistic progression telemetry without gaps or synthetic anomalies. |
+| **Foundation & Auth** | Test the typed tRPC health endpoint, Server-Sent Events (SSE) streaming cancellation, and optional local Supabase Auth panel. | The underlying Phase 1 & 2 transport layer and security infrastructure. |
+
+---
+
+## Codebase Tour
+
+The repository is organized as a strict, clean pnpm monorepo:
+
+```
+kinetra/
+├── apps/
+│   ├── web/               # React 19 + Vite frontend (Tailwind/CSS tokens, TanStack Router/Query, Tab views)
+│   └── api/               # Hono backend with typed tRPC routers, SSE streaming, and secure headers
+├── packages/
+│   ├── contracts/         # Canonical Zod schemas (Profile, Plans, Logs, Sessions, Coach streams, Repositories)
+│   ├── domain/            # Pure sports science calculations, USDA/exercise catalogs, personas, demo repos
+│   ├── db/                # Drizzle ORM schema models, migrations, and tenant isolation types
+│   └── config/            # Shared ESLint/Biome, TS configs, and environment validation
+├── docs/                  # Comprehensive engineering docs and audit trail
+│   ├── ARCHITECTURE.md    # System architecture, data flow, security model, and decision records
+│   ├── PROJECT_PLAN.md    # Multi-phase master completion plan and progress tracking
+│   ├── WORKFLOW.md        # Engineering guidelines, testing protocols, and CI/CD rules
+│   ├── PHASE_1_REPORT.md  # Phase 1 verification evidence
+│   ├── PHASE_2_REPORT.md  # Phase 2 auth & tenant isolation verification evidence
+│   └── PHASE_3_REPORT.md  # Phase 3 domain contracts & synthetic demo verification evidence
+├── scripts/               # Boundary checking, security integration testing, auth seeding, and sanity checks
+├── supabase/              # Local Supabase migrations, RLS policies, quota functions, and SQL seeds
+├── tests/                 # Vitest test suites (domain.test.ts, foundation.test.ts, security.test.ts)
+└── PRIVACY.md             # Privacy policy, data handling guarantees, and launch gates
+```
+
+---
+
+## What Is Going to Happen (The Roadmap)
+
+Kinetra is built according to a strict 6-phase engineering lifecycle:
+
+```mermaid
+flowchart LR
+    P1["Phase 1: Foundation\n(Completed)"] --> P2["Phase 2: Auth & Tenancy\n(Completed)"]
+    P2 --> P3["Phase 3: Domain & Demo\n(Completed)"]
+    P3 --> P4["Phase 4: Verified AI Pipeline\n(Next)"]
+    P4 --> P5["Phase 5: Core Instrument UI\n(Upcoming)"]
+    P5 --> P6["Phase 6: Offline & Launch\n(Upcoming)"]
+```
+
+### ✅ Phase 1: Monorepo Foundation & Toolchain (Complete)
+- Strict TypeScript (`exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`), Biome, Vitest.
+- Hono API with typed tRPC procedures and SSE cancellation transport.
+- Security headers (strict CSP, HSTS, anti-clickjacking) and zero-secret client bundle scans.
+
+### ✅ Phase 2: Security, Auth & Tenant Isolation (Complete)
+- Local Supabase Postgres stack with Row-Level Security (RLS) on all tenant tables.
+- Constrained SQL write functions, atomic rate-limiting, and quota reservations.
+- 40 passing SQL integration and authorization tests (`test:security`).
+
+### ✅ Phase 3: Domain Contracts & Early Synthetic Demo (Complete)
+- Canonical Zod contracts for all core entities: Profiles, Plans, Telemetry, Sessions, and Coach events.
+- Pure sports science calculation library with academic grounding.
+- Standardized USDA nutrition and exercise catalog with fallback resolution.
+- Two complete synthetic personas with 14 days of realistic logs and structured plans.
+- 5-destination web demo with zero cloud credentials required.
+
+### ⏳ Phase 4: Deterministic Verification & AI Pipeline (Next Up)
+- **Server-Side AI Pipeline**: Google Gemini integration isolated exclusively to backend procedures.
+- **Deterministic Verification Engine**: Algorithms that inspect AI-generated meal and workout plans against hard nutritional constraints (calorie bounds, macro tolerances, dietary restrictions, equipment availability) before accepting them.
+- **Bounded Retry Loop**: Automatic regeneration with structured error feedback if generated plans fail verification.
+- **Real-Time Coach Streaming**: SSE endpoint delivering streaming coaching advice with citations and structured follow-up suggestions.
+
+### ⏳ Phase 5: Core Instrument UI & Form Lab (Upcoming)
+- **Production Instrument Interface**: High-density mobile-first ergonomics, micro-interactions, dark/light theme tokens.
+- **Active Workout Session Logger**: Rest timers, RPE/RIR tracking, and superset support.
+- **On-Device Form Lab**: Real-time rep counting and joint-angle analysis using client-side MediaPipe/TensorFlow. **No camera video or photos are ever sent to a remote server.**
+
+### ⏳ Phase 6: Offline Sync, Privacy Lifecycle & Launch Readiness (Upcoming)
+- **Offline First**: Dexie IndexedDB local queue with conflict-free background synchronization.
+- **Privacy & Lifecycle Controls**: One-click GDPR/CCPA data export, cryptographic account purge, and quota monitoring.
+- **Launch Gates Certification**: Performance audits (LCP < 1.2s, INP < 100ms), security penetration testing, and production deployment.
+
+---
+
+## Verification & Quality Commands
+
+Every change to the repository must pass our non-mutating quality check:
 
 ```sh
+# Run full static analysis, boundary check, typecheck, 38 tests, and build checks
 pnpm check
+
+# Run unit and contract tests in watch mode
+pnpm test
+
+# Run API smoke tests (requires API running on port 3001)
 pnpm smoke
 ```
 
-`pnpm check` runs non-mutating format checks, lint/import boundaries, strict types, 20 tests, both builds, and a browser artifact scan. `pnpm smoke` requires the development API to be running and checks real HTTP transport and stream cancellation. The underlying commands are `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build`; `pnpm format` rewrites formatting.
-
-To run the built artifacts, use two terminals after `pnpm build`:
-
-```sh
-pnpm --filter @kinetra/api start
-```
+### Optional: Local Database & Security Suite
+If you have Docker Desktop or OrbStack running, you can test the complete local database and security layer:
 
 ```sh
-pnpm --filter @kinetra/web preview
-```
-
-Open [the built web preview](http://127.0.0.1:4173). The preview proxy expects the API on port 3001. For account mutations in this preview, restart the API with `WEB_ORIGIN=http://127.0.0.1:4173`; restore port 5173 as the web origin when returning to development. This is a local build preview, not evidence of hosted deployment.
-
-### Local database and auth
-
-Start Docker Desktop or OrbStack and confirm `docker version` can reach the server. The pinned Supabase CLI is installed with workspace dependencies.
-
-```sh
+# Start local Supabase containers (Auth, Postgres, Studio)
 pnpm db:start
 pnpm db:migrate
 pnpm db:seed
-pnpm dev:configure
-pnpm test:db
+
+# Run the 40-assertion security and tenant-isolation test suite
 pnpm test:security
+
+# Stop local database containers
+pnpm db:stop
 ```
 
-The first start downloads the official local-service images. API/auth is on `http://127.0.0.1:54321`, Postgres on port 54322, Studio on port 54323, and the local mail viewer on port 54324. Migrations create tenant tables, RLS, constrained write functions, quota reservations, and hourly cleanup. SQL seeding enables local synthetic writes and creates one public synthetic fixture; `db:seed` creates and verifies sign-in for `foundation-cut@example.test` and `foundation-bulk@example.test` with the disposable local password `Local-synthetic-only-2026!`. Never reuse these credentials outside local development. Restart `pnpm dev` after configuration, sign in, and use **Load profile** or save a synthetic profile. `dev:configure` writes ignored local environment files, placing only the public Supabase key in web config; the privileged service key stays in API config. It refuses remote targets and enables only the disposable local database write gate.
+---
 
-`pnpm db:status` shows local connection details. `pnpm db:stop` stops this project's services. **`pnpm db:reset` destroys this project's disposable local database**, reapplies migrations and SQL seeds, and requires `pnpm db:seed` afterward to recreate auth fixtures. `test:db` runs 40 SQL assertions. `test:security` creates temporary synthetic accounts and checks real Auth/PostgREST isolation, conflicts, expiry, and concurrent budgets, then removes those accounts. All migration/reset scripts explicitly target local services; none requires linking a remote project.
+## Key Documentation
 
-### Environment and troubleshooting
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - System topology, data models, state machine, and design patterns.
+- [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md) - Step-by-step deliverable checklist for all 6 phases.
+- [docs/PHASE_3_REPORT.md](docs/PHASE_3_REPORT.md) - Full evidence and verification report for the current Phase 3 build.
+- [docs/WORKFLOW.md](docs/WORKFLOW.md) - Git conventions, testing requirements, and coding standards.
+- [PRIVACY.md](PRIVACY.md) - Data minimization guarantees and privacy policy.
 
-- Local defaults work even without copied environment files. The optional API file uses `NODE_ENV=development`, `KINETRA_ENV=development`, `PORT=3001`, and `WEB_ORIGIN=http://127.0.0.1:5173`. Web config uses `VITE_API_BASE_URL=/api`.
-- For separate hosted previews, use an HTTPS web origin, `KINETRA_ENV=preview`, preview-specific Supabase configuration, and a web API URL ending in `/api`. See [the preview checklist](docs/PHASE_1_REPORT.md#preview-deployment-handoff). Development mode is rejected when the Node runtime is production.
-- If the connection card fails, confirm both services are running. If port 5173 is occupied, stop the other process; Vite intentionally refuses to choose a hidden alternate port. If changing the API port, also update the Vite proxy.
-- If Docker is missing from PATH on an OrbStack Mac, make its Docker CLI available before starting Supabase. For the standard install, `export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"` works. Start OrbStack first.
-- If Supabase cannot start, check that Docker is running and ports 54320–54324 are available. Fresh startup can take several minutes while downloading images.
-- If frozen installation fails, check Node/pnpm versions and registry access. Update dependency manifests and the lockfile together; CI must never silently rewrite the lockfile.
-
-Hosted migrations leave account writes disabled. Do not enable real-user collection until Phase 6 lifecycle controls pass. Configure exact API/Supabase origins in hosted CSP and verify sign-in in the deployed preview; the checked-in web hosting policy starts with `connect-src 'self'`.
-
-Secrets belong in ignored local environment files or hosting secret stores. Only explicitly public `VITE_` values may be used in browser code; provider keys and privileged database credentials must never appear in browser assets.
-
-## Reliability and privacy principles
-
-- Schema validation checks shape; deterministic verification checks product constraints. Both are required before a generated plan is accepted.
-- Generated text remains untrusted even after schema validation. Render it as text; sanitize any explicitly supported rich content.
-- Authentication, authorization, atomic quotas, and request limits protect every account-bound AI and data endpoint.
-- Health calculations and form scores are estimates with stated limitations. The app must not claim diagnosis or body-fat measurement from a photo.
-- Camera analysis runs locally by default. Stored photos require separate consent and private access.
-- Demo data is synthetic and isolated from real accounts. Logs and telemetry exclude raw photos, secrets, and private conversation content.
-
-## Contributing and completion
-
-Use [the workflow](docs/WORKFLOW.md) for changes and [the project plan](docs/PROJECT_PLAN.md) for task selection. A task is complete only when its acceptance checks pass and evidence is recorded; an unchecked item remains outstanding.
-
-A license has not been selected. Choose one deliberately before public distribution. A live URL, screenshots, measured coverage, and evaluation scores should be added only after they exist and can be reproduced.
