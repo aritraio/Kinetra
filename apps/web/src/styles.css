@@ -1,0 +1,119 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #eae9e4;
+  background: #191a18;
+  font-synthesis: none;
+  line-height: 1.6;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 1000px;
+  margin: auto;
+  padding: 32px clamp(20px, 5vw, 64px);
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid #50534b;
+  padding-bottom: 24px;
+}
+.wordmark {
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+.phase,
+.eyebrow,
+footer {
+  color: #bfc1b7;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+}
+h1 {
+  font-family: Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.4rem, 5vw, 4.5rem);
+  line-height: 1.1;
+  margin: 18px 0;
+}
+h2 {
+  font-weight: 500;
+  font-size: 1.2rem;
+  margin: 0;
+}
+section {
+  padding: 40px 0;
+}
+.intro {
+  max-width: 570px;
+  color: #bfc1b7;
+}
+.instrument {
+  border-top: 1px solid #50534b;
+}
+output {
+  display: block;
+  min-height: 3rem;
+  font-family: monospace;
+}
+button {
+  padding: 10px 16px;
+  background: #e8a47f;
+  color: #21180f;
+  border: 1px solid #e8a47f;
+  border-radius: 2px;
+  font: inherit;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+button:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
+}
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+footer {
+  border-top: 1px solid #50534b;
+  padding-top: 24px;
+}
+@media (max-width: 520px) {
+  header {
+    flex-direction: column;
+  }
+  section {
+    padding: 28px 0;
+  }
+}
+form {
+  display: grid;
+  gap: 16px;
+  max-width: 420px;
+  margin-top: 24px;
+}
+label {
+  display: grid;
+  gap: 6px;
+}
+input {
+  color: #eae9e4;
+  background: #242620;
+  border: 1px solid #868a7a;
+  padding: 10px;
+  border-radius: 2px;
+  font: inherit;
+}
+input:focus-visible {
+  outline: 3px solid #e8a47f;
+  outline-offset: 3px;
+}

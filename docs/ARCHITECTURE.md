@@ -1,8 +1,8 @@
 # Kinetra architecture
 
-**Status:** proposed implementation baseline. **Baseline date:** 2026-10-01.
+**Status:** target architecture with the Phase 2 local security foundation implemented. **Baseline date:** 2026-10-01.
 
-This document describes what Kinetra should become. The checkout currently contains documentation, not the implementation shown below. Historical reviews are useful design inputs, but their account of the previous app is not evidence about this repository's runtime behavior.
+This document describes what Kinetra should become. The checkout contains the typed foundation and tenant security described in [the Phase 1 report](PHASE_1_REPORT.md) and [Phase 2 report](PHASE_2_REPORT.md). The full system shown below remains a target architecture. Historical reviews are useful design inputs, but their account of the previous app is not evidence about this repository's runtime behavior.
 
 ## 1. Goals and constraints
 
@@ -26,8 +26,8 @@ Skincare, body-fat estimation from images, social leaderboards, wearable integra
 | --- | --- |
 | Product name | Repository and README use Kinetra |
 | Planning inputs | Three review Markdown files at the root |
-| Application source | Absent |
-| Runtime, packages, tests, SQL, hosting configuration | Absent |
+| Application source | Phase 1 React client, Hono/tRPC API, synthetic stream, and shared packages |
+| Runtime, packages, tests, SQL, hosting configuration | Pinned workspace, 20 unit/contract tests, 40 SQL assertions, live security integration, local Supabase fixture/auth setup, CI and API preview configuration; hosted verification pending |
 | Prior implementation | Described by the reviews as vanilla JS, Clerk, Supabase, and serverless AI functions; not independently verified here |
 
 If the previous implementation is imported, first inventory it and reproduce its behavior. Convert historical findings into confirmed issues with reproduction cases. If it is unavailable, build the target architecture from a clean scaffold and treat migration-specific tasks as explicitly not applicable with an explanation.
@@ -75,7 +75,7 @@ Use Hono on a **Node serverless runtime** initially. This avoids making edge com
 
 Use tRPC for typed application procedures and a dedicated SSE endpoint for coach text and generation status. Share schemas across both. A spike must verify the Hono/tRPC adapter and deployment behavior before locking the integration; if it fails, document a typed HTTP alternative before implementing features.
 
-Use Supabase Auth, Postgres, and private Storage to consolidate identity and tenant data. Use Drizzle for versioned schema changes. If prior Clerk accounts exist, retain Clerk until a tested identity mapping and account migration path are approved; changing auth must not create orphaned records or force silent account recreation.
+Use Supabase Auth, Postgres, and private Storage to consolidate identity and tenant data. Use versioned SQL migrations for schema changes, policies, functions, and grants, with Drizzle definitions for typed row shapes. If prior Clerk accounts exist, retain Clerk until a tested identity mapping and account migration path are approved; changing auth must not create orphaned records or force silent account recreation.
 
 Use Dexie for IndexedDB and Workbox for service-worker lifecycle management. Start with Gemini as the primary provider candidate, then add one fallback only after capabilities and output quality are measured. Optional tooling such as Turborepo or a shared UI package is justified by actual reuse, not required at scaffold time.
 
@@ -231,4 +231,14 @@ Use separate development, preview, and production resources. Apply migrations wi
 | Supported Form Lab scope | One exercise, local processing | Device trials and labeled landmark fixtures |
 | Licensing | Undecided | Owner chooses distribution terms |
 
-For each significant decision, create `docs/decisions/NNNN-title.md` with context, alternatives, decision, consequences, validation evidence, and conditions for revisiting it. Those records are future deliverables; this document does not claim they already exist.
+For each significant decision, create `docs/decisions/NNNN-title.md` with context, alternatives, decision, consequences, validation evidence, and conditions for revisiting it. Four Phase 0 decisions now exist in `docs/decisions/`; later decisions should follow the same process.
+
+## Phase 2 implementation boundaries
+
+The account API verifies bearer tokens with Supabase Auth, then forwards the user token to PostgREST. Tenant reads require both owner filters and RLS. Browser-supplied owners are rejected; profile/log mutations use allow-listed RPCs deriving identity from `auth.uid()`. Direct authenticated table writes are denied. Revisions protect concurrent edits; log timezones remain attached to the original entry.
+
+Service-role access is limited to explicit local setup/testing and server-only budget/cleanup operations. Budget acquisition locks global and owner counters in a consistent order, reserves request/token ceilings, and creates a 30-second concurrency lease. It does not yet reconcile actual provider usage. Disabled AI routes make no provider request.
+
+Migrations default account writes off. The database checks this flag even on direct RPC calls; the API additionally prohibits account writes outside local development. This gate blocks real-user collection until export/deletion are delivered. See [ADR 0005](decisions/0005-security-and-collection-gates.md) and [the privacy policy](../PRIVACY.md).
+
+The browser uses memory-only sessions, clears owner state on logout/switch, rejects stale responses from previous owners, and renders untrusted names as text. Development permits Vite's inline refresh script and injected styles; production preview uses external scripts under a stricter CSP. Hosted exact-origin configuration and deployed auth/CSP verification are pending. Photos, offline persistence, fitness calculations, provider adapters, and user privacy controls remain future work.

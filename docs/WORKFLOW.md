@@ -1,6 +1,6 @@
 # Kinetra development and delivery workflow
 
-**Status:** proposed workflow. The application workspace and CI do not exist yet. Commands and service-specific steps below are requirements to implement, not claims about working scripts.
+**Status:** Phase 2 local security checks and the CI workflow are implemented. The [Phase 2 report](PHASE_2_REPORT.md) records evidence; observed hosted CI and preview verification remain pending. Later-stage workflows below remain requirements.
 
 Use this document with the [architecture](ARCHITECTURE.md) and [completion plan](PROJECT_PLAN.md). The architecture defines boundaries; the plan defines scope and sequencing; this workflow defines how work becomes a verified release.
 
@@ -41,7 +41,7 @@ A checkbox records completion only after acceptance evidence exists. If the task
 
 Phase 1 must create and test a root setup contract. Pin Node and pnpm versions, document environment files per application, and provide synthetic local seeds.
 
-The following are **proposed script names** to add to the root manifest:
+The following is the full target script contract. Foundation scripts are implemented; coverage, E2E, and evaluation scripts will be added when those features exist. Use the README for currently runnable commands.
 
 | Script | Intended responsibility |
 | --- | --- |
@@ -202,4 +202,14 @@ Suggested maintenance cadence after launch:
 
 Update docs in the same PR as behavior changes. Maintain architecture decisions for major choices and dated evaluation reports for measured claims. The roadmap is a living checklist; preserve completed task IDs and evidence references when adding new scope.
 
-Future supporting files to create at their respective phase: `CONTRIBUTING.md`, `PRIVACY.md`, environment examples, a selected `LICENSE`, an evaluation guide, deployment/rollback runbook, and incident notes. Do not publish retention promises or setup commands before implementation can satisfy them.
+The current [privacy policy](../PRIVACY.md) describes synthetic local operation and release lifecycle targets. Finalize it against deployed controls before launch. Future supporting files to create at their respective phase: `CONTRIBUTING.md`, a selected `LICENSE`, an evaluation guide, deployment/rollback runbook, and incident notes. Do not publish retention promises or setup commands before implementation can satisfy them.
+
+## Phase 2 verification and handoff
+
+1. Run `pnpm check` for formatting, dependency boundaries, strict types, 20 unit/contract checks, both builds, and secret scanning.
+2. Start the disposable local Supabase stack and run `pnpm db:migrate`, `pnpm db:seed`, and `pnpm dev:configure`; restart development services after configuration. Keep generated environment files ignored.
+3. Run `pnpm test:db` for 40 policy/constraint/cleanup assertions, then `pnpm test:security` for real Auth/PostgREST, two-owner access, revision races, malformed/expired tokens, and concurrent quotas. The latter removes its temporary accounts automatically.
+4. Before accepting a migration, test both upgrade and fresh reset paths. `pnpm db:reset` destroys only this project's disposable local database; follow it with auth seeding. Never use synthetic seeds or reset against a hosted project.
+5. Review browser sign-in, save/conflict feedback, literal unsafe text, and logout clearing. Validate CSP and exact allowed origins again in an isolated hosted preview. The local-only quota probe is not a public AI endpoint.
+6. Record evidence and keep P2-06 open until deployed auth/CSP verification exists. Do not treat an unobserved CI definition as a passing remote run.
+7. Leave hosted account-write settings disabled. Phase 6 export/deletion, object cleanup, retention, and backup limitations must be verified before real-user collection is enabled through a reviewed migration and API change.

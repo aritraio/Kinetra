@@ -37,3 +37,10 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+
+# Local database/runtime and deployment state
+supabase/.temp/
+supabase/.branches/
+.vercel/
+.env.*
+!.env.example

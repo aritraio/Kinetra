@@ -1,6 +1,6 @@
 # Kinetra phased completion plan
 
-**Status:** implementation backlog, based on the documentation-only checkout inspected on 2026-10-01. No application task below is claimed complete.
+**Status:** Phase 0 complete; Phase 1 locally implemented with hosted evidence pending as of 2026-10-01. Later phases remain implementation backlog.
 
 This plan consolidates the original reviews into an ordered path to a usable initial release and full v1. It prioritizes a runnable foundation, tenant security, verified AI output, privacy, and an early synthetic demo. The architecture and workflow are [documented separately](ARCHITECTURE.md) and [here](WORKFLOW.md).
 
@@ -73,31 +73,33 @@ Initial release can ship at M3 after the applicable release and operational chec
 
 **Dependencies:** Phase 0. **Output:** reproducible workspace with a thin end-to-end slice.
 
-- [ ] **P1-01 — Scaffold pnpm workspaces.** Create web, API, contracts, domain, database, and shared configuration packages. Pin compatible Node/pnpm/dependency versions and commit the lockfile.
-- [ ] **P1-02 — Add strict TypeScript and dependency boundaries.** Compile all packages, prevent server imports in browser code, and prohibit implicit `any`. Validate external input as `unknown` before use.
-- [ ] **P1-03 — Choose and configure one formatter/linter.** Add shared config and non-mutating CI checks; avoid duplicate competing toolchains.
+- [x] **P1-01 — Scaffold pnpm workspaces.** Create web, API, contracts, domain, database, and shared configuration packages. Pin compatible Node/pnpm/dependency versions and commit the lockfile.
+- [x] **P1-02 — Add strict TypeScript and dependency boundaries.** Compile all packages, prevent server imports in browser code, and prohibit implicit `any`. Validate external input as `unknown` before use.
+- [x] **P1-03 — Choose and configure one formatter/linter.** Add shared config and non-mutating CI checks; avoid duplicate competing toolchains.
 - [ ] **P1-04 — Implement the transport/deployment spike.** Run a typed Hono/tRPC request and a dedicated SSE stream locally and in a preview. Verify auth-header transport, cancellation, event framing, runtime compatibility, and hosting timeout behavior.
-- [ ] **P1-05 — Define environment contracts.** Add per-app examples with placeholders, ignored local files, startup validation, and separate dev/preview/production configuration. Scan web artifacts for secret variable names and seeded test secrets.
-- [ ] **P1-06 — Add local database/auth setup and synthetic seeds.** Document prerequisites, ports, reset commands, and migration commands. A fresh developer environment must boot without production credentials.
+- [x] **P1-05 — Define environment contracts.** Add per-app examples with placeholders, ignored local files, startup validation, and separate dev/preview/production configuration. Scan web artifacts for secret variable names and seeded test secrets.
+- [x] **P1-06 — Add local database/auth setup and synthetic seeds.** Document prerequisites, ports, reset commands, and migration commands. A fresh developer environment must boot without production credentials.
 - [ ] **P1-07 — Add the initial CI workflow.** Run formatting, lint, types, a basic unit/contract test, and production build on PRs. Confirm a deliberately failing check blocks the gate.
-- [ ] **P1-08 — Replace README setup placeholders.** Test documented commands from a fresh clone and record exact script behavior, runtime versions, and troubleshooting.
+- [x] **P1-08 — Replace README setup placeholders.** Test documented commands from a fresh clone and record exact script behavior, runtime versions, and troubleshooting.
 
-**Exit gate:** fresh setup succeeds; the preview serves a typed request and real SSE stream; CI passes; no server secrets are bundled into the client.
+**Exit gate:** fresh setup succeeds; the preview serves a typed request and real SSE stream; CI passes; no server secrets are bundled into the client. Local checks pass; hosted preview and observed GitHub CI gates remain pending. P1-04 and P1-07 are implemented locally but stay unchecked until hosted evidence exists. See [the Phase 1 report](PHASE_1_REPORT.md).
 
 ## 5. Phase 2 — Security, identity, data, and privacy foundation
 
 **Dependencies:** Phase 1 and any source recovery. **Output:** tenant-isolated storage and a closed AI boundary.
 
-- [ ] **P2-01 — Implement sign-in/session handling.** Require verified identity on account data and AI routes. Missing or expired sessions return a clear unauthenticated result. Auth service failure must not turn paid generation into guest access.
-- [ ] **P2-02 — Migrate existing identity only if needed.** Map old user IDs to new subjects, check record/object counts and ownership, and rehearse recovery. Otherwise record a greenfield decision and test creation of a new profile.
-- [ ] **P2-03 — Implement owner-scoped database tables and RLS.** Create profiles, daily logs, training sessions, plans/versions, usage buckets, operations, and required privacy records. Test anonymous, owner, and second-account access directly against the database and API.
-- [ ] **P2-04 — Remove unsafe provider access.** Accept only server-configured provider keys. Reject client keys, legacy key paths, arbitrary model/endpoint selection, oversized payloads, and unsupported methods before any provider request.
-- [ ] **P2-05 — Implement atomic quotas and request budgets.** Enforce per-account limits, concurrency, payload sizes, and global provider budgets. Stress concurrent requests and prove the configured limit cannot be exceeded through a read/update race. Schedule expired-bucket cleanup.
+Local implementation and acceptance evidence: [Phase 2 report](PHASE_2_REPORT.md). P2-02 is the documented greenfield alternative; no historical identities were imported. P2-06 remains open for deployed preview verification. Retention targets are documented separately from future enforcement, and real-user collection remains gated.
+
+- [x] **P2-01 — Implement sign-in/session handling.** Require verified identity on account data and AI routes. Missing or expired sessions return a clear unauthenticated result. Auth service failure must not turn paid generation into guest access.
+- [x] **P2-02 — Migrate existing identity only if needed.** Map old user IDs to new subjects, check record/object counts and ownership, and rehearse recovery. Otherwise record a greenfield decision and test creation of a new profile.
+- [x] **P2-03 — Implement owner-scoped database tables and RLS.** Create profiles, daily logs, training sessions, plans/versions, usage buckets, operations, and required privacy records. Test anonymous, owner, and second-account access directly against the database and API.
+- [x] **P2-04 — Remove unsafe provider access.** Accept only server-configured provider keys. Reject client keys, legacy key paths, arbitrary model/endpoint selection, oversized payloads, and unsupported methods before any provider request.
+- [x] **P2-05 — Implement atomic quotas and request budgets.** Enforce per-account limits, concurrency, payload sizes, and global provider budgets. Stress concurrent requests and prove the configured limit cannot be exceeded through a read/update race. Schedule expired-bucket cleanup.
 - [ ] **P2-06 — Secure rendering and browser policy.** Prefer framework text rendering, replace inline handlers, and sanitize explicitly supported rich content. Add headers appropriate to auth/CDN usage, pinned assets where applicable, and an effective CSP. Verify normal auth and unsafe payload cases in the deployed preview.
-- [ ] **P2-07 — Allow-list profile persistence.** Exclude images, credentials, UI-only state, and unknown keys. Coalesce saves and use revisions to avoid racing updates. Verify request size and saved fields.
-- [ ] **P2-08 — Fix date and unit semantics.** Normalize calculation units, store UTC event timestamps, retain local date/timezone, and test midnight, daylight-saving transitions, travel, and edited past entries.
-- [ ] **P2-09 — Define consent and retention policy.** Decide real periods per data class, provider-processing disclosure, and separate camera/storage consent. Specify export/deletion behavior and backup limitations. Publish `PRIVACY.md` before inviting real users; its promises must match implemented controls.
-- [ ] **P2-10 — Test migration and administrative access.** Run fresh and upgrade migrations, verify constraints and RLS, and test narrowly scoped cleanup jobs. Reserve privileged credentials for explicit jobs.
+- [x] **P2-07 — Allow-list profile persistence.** Exclude images, credentials, UI-only state, and unknown keys. Coalesce saves and use revisions to avoid racing updates. Verify request size and saved fields.
+- [x] **P2-08 — Fix date and unit semantics.** Normalize calculation units, store UTC event timestamps, retain local date/timezone, and test midnight, daylight-saving transitions, travel, and edited past entries.
+- [x] **P2-09 — Define consent and retention policy.** Decide real periods per data class, provider-processing disclosure, and separate camera/storage consent. Specify export/deletion behavior and backup limitations. Publish `PRIVACY.md` before inviting real users; its promises must match implemented controls.
+- [x] **P2-10 — Test migration and administrative access.** Run fresh and upgrade migrations, verify constraints and RLS, and test narrowly scoped cleanup jobs. Reserve privileged credentials for explicit jobs.
 
 **Exit gate:** unauthorized and wrong-owner access is denied; quota concurrency and untrusted text checks pass; no photo bytes enter profile JSON; retention/consent decisions are documented. Do not collect real user data until Phase 6 export/deletion controls also pass.
 

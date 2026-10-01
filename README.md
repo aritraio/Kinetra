@@ -2,7 +2,7 @@
 
 Kinetra is a planned fitness web app that combines personal planning, daily tracking, offline logging, and measurable AI reliability. Its central goal is to turn user context into useful meal and workout plans, verify those plans before displaying them, and adapt recommendations using recorded progress.
 
-**Project status: planning and documentation.** This checkout contains the project reviews and the documentation below. It does not yet contain an application, dependency manifest, database migrations, automated tests, or deployment configuration. Features and stack choices described here are proposed until implementation and validation evidence are added.
+**Project status: Phase 2 security foundation implemented locally.** The typed web/API workspace now includes synthetic sign-in, verified account access, owner-scoped tables and RLS, revision-protected profile/log writes, consent records, and atomic budget reservations. AI, photos, and real-user collection remain disabled. Hosted preview verification and observed GitHub Actions evidence are pending. See the [Phase 2 evidence report](docs/PHASE_2_REPORT.md) and [privacy policy](PRIVACY.md).
 
 ## Start here
 
@@ -10,6 +10,7 @@ Kinetra is a planned fitness web app that combines personal planning, daily trac
 | --- | --- |
 | [Architecture](docs/ARCHITECTURE.md) | What are the components, data models, boundaries, and technical decisions? |
 | [Workflow](docs/WORKFLOW.md) | How do we develop, test, review, deploy, and maintain the project? |
+| [Privacy](PRIVACY.md) | What is collected locally, what remains disabled, and which lifecycle gates block launch? |
 | [Completion plan](docs/PROJECT_PLAN.md) | What do we build, in what order, and what proves each phase is finished? |
 
 The three original reviews are retained as inputs: [feature and quality audit](ideas.improve.md), [stack and design blueprint](improve.md), and [recommendations](recomenation-for-imporvemt.md). They describe a prior FitnessBaba implementation and suggest other names, including Metria. **Kinetra** is the name used in this repository. Historical file paths, vulnerability findings, coverage numbers, provider prices, and performance claims in those reviews have not been verified against application code in this checkout.
@@ -55,7 +56,7 @@ These are goals, not implemented capabilities. [The phase checklist](docs/PROJEC
 | Forms and contracts | React Hook Form, Zod; validation on the server and client |
 | Styling | Tailwind CSS with custom accessible design tokens |
 | API | Hono on a Vercel Node serverless runtime; typed tRPC procedures and a separate SSE transport |
-| Data and identity | Supabase Postgres, Auth, private Storage; Drizzle migrations |
+| Data and identity | Supabase Postgres and Auth; SQL migrations with typed Drizzle row models; private Storage planned |
 | Offline | IndexedDB through Dexie; versioned service worker using Workbox |
 | AI | Server-only provider adapters; Gemini as the first candidate, other adapters after capability and evaluation checks |
 | Verification | Pure TypeScript domain rules, Vitest, component tests, a small Playwright suite, and AI evaluations |
@@ -65,18 +66,69 @@ Versions, model identifiers, SDK compatibility, hosting limits, and pricing must
 
 ## Local setup
 
-There is no runnable development setup yet. Do not expect `pnpm install` or `pnpm dev` to work until Phase 1 creates the workspace.
+Use Node **24.19.0** (pinned in `.node-version`/`.nvmrc`; newer Node 24 patch releases are supported) and pnpm **11.19.0**. If needed, install the pinned package manager with `npm install --global pnpm@11.19.0`.
 
-After the scaffold is implemented, the intended onboarding is:
+From the repository root:
 
-1. Install the runtime and pnpm versions pinned by the repository.
-2. Install dependencies using the committed lockfile.
-3. Copy each application's documented environment example to its local environment file.
-4. Start local database/auth services and apply migrations plus synthetic seed data.
-5. Run the web and API development services.
-6. Run formatting, lint, type checks, unit/contract tests, and the production build.
+```sh
+pnpm install --frozen-lockfile
+cp apps/api/.env.example apps/api/.env.local
+cp apps/web/.env.example apps/web/.env.local
+pnpm dev
+```
 
-Phase 1 must replace this section with exact, tested commands and troubleshooting instructions. Secrets belong in local ignored files or the hosting secret store. Provider keys and privileged database credentials must never appear in browser assets.
+Open [the local app](http://127.0.0.1:5173). The API runs at `http://127.0.0.1:3001`; Vite proxies `/api` to it. The connection card exercises a typed request, and **Start stream** exercises a finite synthetic SSE response. **Cancel** aborts it. The transport slice requires no cloud account, provider key, or database service. Account sign-in is optional and requires the local setup below. Enter synthetic data only. Stop the development services with Ctrl+C.
+
+### Checks and builds
+
+```sh
+pnpm check
+pnpm smoke
+```
+
+`pnpm check` runs non-mutating format checks, lint/import boundaries, strict types, 20 tests, both builds, and a browser artifact scan. `pnpm smoke` requires the development API to be running and checks real HTTP transport and stream cancellation. The underlying commands are `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build`; `pnpm format` rewrites formatting.
+
+To run the built artifacts, use two terminals after `pnpm build`:
+
+```sh
+pnpm --filter @kinetra/api start
+```
+
+```sh
+pnpm --filter @kinetra/web preview
+```
+
+Open [the built web preview](http://127.0.0.1:4173). The preview proxy expects the API on port 3001. For account mutations in this preview, restart the API with `WEB_ORIGIN=http://127.0.0.1:4173`; restore port 5173 as the web origin when returning to development. This is a local build preview, not evidence of hosted deployment.
+
+### Local database and auth
+
+Start Docker Desktop or OrbStack and confirm `docker version` can reach the server. The pinned Supabase CLI is installed with workspace dependencies.
+
+```sh
+pnpm db:start
+pnpm db:migrate
+pnpm db:seed
+pnpm dev:configure
+pnpm test:db
+pnpm test:security
+```
+
+The first start downloads the official local-service images. API/auth is on `http://127.0.0.1:54321`, Postgres on port 54322, Studio on port 54323, and the local mail viewer on port 54324. Migrations create tenant tables, RLS, constrained write functions, quota reservations, and hourly cleanup. SQL seeding enables local synthetic writes and creates one public synthetic fixture; `db:seed` creates and verifies sign-in for `foundation-cut@example.test` and `foundation-bulk@example.test` with the disposable local password `Local-synthetic-only-2026!`. Never reuse these credentials outside local development. Restart `pnpm dev` after configuration, sign in, and use **Load profile** or save a synthetic profile. `dev:configure` writes ignored local environment files, placing only the public Supabase key in web config; the privileged service key stays in API config. It refuses remote targets and enables only the disposable local database write gate.
+
+`pnpm db:status` shows local connection details. `pnpm db:stop` stops this project's services. **`pnpm db:reset` destroys this project's disposable local database**, reapplies migrations and SQL seeds, and requires `pnpm db:seed` afterward to recreate auth fixtures. `test:db` runs 40 SQL assertions. `test:security` creates temporary synthetic accounts and checks real Auth/PostgREST isolation, conflicts, expiry, and concurrent budgets, then removes those accounts. All migration/reset scripts explicitly target local services; none requires linking a remote project.
+
+### Environment and troubleshooting
+
+- Local defaults work even without copied environment files. The optional API file uses `NODE_ENV=development`, `KINETRA_ENV=development`, `PORT=3001`, and `WEB_ORIGIN=http://127.0.0.1:5173`. Web config uses `VITE_API_BASE_URL=/api`.
+- For separate hosted previews, use an HTTPS web origin, `KINETRA_ENV=preview`, preview-specific Supabase configuration, and a web API URL ending in `/api`. See [the preview checklist](docs/PHASE_1_REPORT.md#preview-deployment-handoff). Development mode is rejected when the Node runtime is production.
+- If the connection card fails, confirm both services are running. If port 5173 is occupied, stop the other process; Vite intentionally refuses to choose a hidden alternate port. If changing the API port, also update the Vite proxy.
+- If Docker is missing from PATH on an OrbStack Mac, make its Docker CLI available before starting Supabase. For the standard install, `export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"` works. Start OrbStack first.
+- If Supabase cannot start, check that Docker is running and ports 54320–54324 are available. Fresh startup can take several minutes while downloading images.
+- If frozen installation fails, check Node/pnpm versions and registry access. Update dependency manifests and the lockfile together; CI must never silently rewrite the lockfile.
+
+Hosted migrations leave account writes disabled. Do not enable real-user collection until Phase 6 lifecycle controls pass. Configure exact API/Supabase origins in hosted CSP and verify sign-in in the deployed preview; the checked-in web hosting policy starts with `connect-src 'self'`.
+
+Secrets belong in ignored local environment files or hosting secret stores. Only explicitly public `VITE_` values may be used in browser code; provider keys and privileged database credentials must never appear in browser assets.
 
 ## Reliability and privacy principles
 

@@ -2,5 +2,27 @@
   "name": "@kinetra/api",
   "version": "0.0.1",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "exports": {
+    "./router": {
+      "types": "./src/router.ts"
+    }
+  },
+  "scripts": {
+    "dev": "node --watch --import tsx --env-file-if-exists=.env.local src/dev.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "esbuild src/dev.ts --bundle --platform=node --format=esm --external:@hono/node-server --external:hono --external:hono/* --external:@trpc/* --external:zod --outfile=dist/server.js",
+    "start": "node --env-file-if-exists=.env.local dist/server.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "2.1.3",
+    "@trpc/server": "11.19.0",
+    "@kinetra/contracts": "workspace:*",
+    "@kinetra/domain": "workspace:*",
+    "hono": "4.13.12",
+    "zod": "4.6.5"
+  },
+  "engines": {
+    "node": ">=24.19.0 <25"
+  }
 }
