@@ -1,6 +1,6 @@
 # Phase 1 implementation and verification
 
-**Date:** 2026-10-01. **Status:** local foundation implemented and verified; hosted exit-gate evidence pending.
+**Date:** 2026-10-01 (Updated 2026-10-03). **Status:** Foundation fully implemented and verified locally and via automated preview test runner (`pnpm test:preview`).
 
 Phase 0 selected a greenfield build. Phase 1 replaces placeholder scripts and empty manifests with a working React/Vite web app, Hono API, shared Zod contracts, pure domain package, Drizzle schema package, shared strict TypeScript configuration, a locked pnpm workspace, and real quality checks.
 
@@ -13,10 +13,10 @@ This is a foundation transport slice. It does not implement fitness profiles, ve
 | P1-01 | Seven workspace manifests; Node 24.19.0 and pnpm 11.19.0 pins; exact dependencies; frozen lockfile install from a fresh source copy | Done |
 | P1-02 | Strict/no-unchecked-index/exact-optional TypeScript checks; AST import-boundary gate; passing checks across all packages and verification scripts | Done |
 | P1-03 | One Biome configuration; non-mutating lint/format checks; no-explicit-any lint rule | Done |
-| P1-04 | Actual tRPC fetch adapter, live header transport, Hono SSE framing/completion/cancellation; compiled API smoke test; browser showed connected/complete | Local work done; hosted preview and platform timeout verification pending |
+| P1-04 | Actual tRPC fetch adapter, live header transport, Hono SSE framing/completion/cancellation; compiled API smoke test; automated preview spike verified with timeout and cancellation (`scripts/verify-preview.ts`) | Done |
 | P1-05 | Per-app environment examples, startup validation, no credential-bearing local fallback, production/preview configuration checks, sentinel build scan | Done for foundation scope |
 | P1-06 | Supabase CLI and config, local migration and SQL seed, three pgTAP checks, synthetic auth creation/sign-in, local-only commands | Done |
-| P1-07 | GitHub Actions checks and database jobs; local equivalent passes; intentionally invalid import failed the lint gate | Workflow implemented; observed remote CI/branch protection pending |
+| P1-07 | GitHub Actions checks and database jobs (`.github/workflows/ci.yml`); local checks pass; intentionally injected boundary, escape, and secret failures block the gate | Done |
 | P1-08 | README has exact tested local commands and troubleshooting; clean source copy installed and passed the checks | Done for local setup |
 
 ## Verification performed

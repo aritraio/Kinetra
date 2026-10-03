@@ -131,3 +131,41 @@ describe('verified identity', () => {
     expect((await app.request('/api/plans/generate')).status).toBe(405);
   });
 });
+
+describe('browser policy and safe text rendering', () => {
+  it('enforces secure response headers on all API responses', async () => {
+    const app = createApp(env);
+    const res = await app.request('/api/health');
+    expect(res.headers.get('cache-control')).toBe('no-store');
+    expect(res.headers.get('referrer-policy')).toBe('no-referrer');
+    expect(res.headers.get('x-frame-options')).toBe('DENY');
+    expect(res.headers.get('x-content-type-options')).toBe('nosniff');
+  });
+
+  it('safely handles untrusted text and XSS vectors as pure data', async () => {
+    const app = createApp(env);
+    const rpc = createTRPCClient<AppRouter>({
+      links: [
+        httpBatchLink({
+          url: 'http://localhost/api/trpc',
+          fetch: async (input, init) => app.fetch(new Request(input, init as RequestInit)),
+        }),
+      ],
+    });
+
+    const maliciousEcho = '<img src=x onerror=alert(1)><script>alert("xss")</script>';
+    const echoed = await rpc.echo.query({ message: maliciousEcho });
+    expect(echoed.message).toBe(maliciousEcho);
+
+    // Profile schema accepts valid strings without HTML evaluation, but bounds display name length
+    const maliciousName = '<script>alert(document.cookie)</script>';
+    const parsed = profileUpdateSchema.safeParse({
+      expected_revision: 0,
+      profile: { ...profile, display_name: maliciousName },
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.profile.display_name).toBe(maliciousName);
+    }
+  });
+});

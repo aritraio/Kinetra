@@ -110,6 +110,29 @@ describe('SSE protocol', () => {
       consumeStream(chunkedResponse('data: {"type":"unknown"}\n\n'), () => {}),
     ).rejects.toThrow();
   });
+  it('cancels the underlying stream and releases the reader on consumer abort', async () => {
+    let streamCancelled = false;
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(
+          new TextEncoder().encode('data: {"type":"started","protocolVersion":1}\n\n'),
+        );
+        controller.enqueue(
+          new TextEncoder().encode('data: {"type":"text_delta","text":"hello"}\n\n'),
+        );
+      },
+      cancel() {
+        streamCancelled = true;
+      },
+    });
+    const response = new Response(stream, { headers: { 'Content-Type': 'text/event-stream' } });
+    await expect(
+      consumeStream(response, (event) => {
+        if (event.type === 'text_delta') throw new Error('Client abort simulation');
+      }),
+    ).rejects.toThrow('Client abort simulation');
+    expect(streamCancelled).toBe(true);
+  });
 });
 
 describe('build safety gates', () => {
@@ -136,5 +159,24 @@ describe('build safety gates', () => {
       'kinetra-build-sentinel-private',
     ]);
     expect(scanText('public fixture')).toEqual([]);
+  });
+  it('confirms that a deliberately failing check blocks the gate', () => {
+    const boundaryErrors = checkSource(
+      'apps/web/src/compromised.ts',
+      "import { appRouter } from '@kinetra/api/router';",
+    );
+    expect(boundaryErrors.length).toBeGreaterThan(0);
+    expect(boundaryErrors[0]).toContain('forbidden workspace import');
+
+    const escapeErrors = checkSource(
+      'apps/web/src/escape.ts',
+      "import { something } from '../../api/src/server';",
+    );
+    expect(escapeErrors.length).toBeGreaterThan(0);
+    expect(escapeErrors[0]).toContain('cross-package relative import');
+
+    const secretErrors = scanText('const SUPABASE_SERVICE_ROLE_KEY = "eyJh..."');
+    expect(secretErrors.length).toBeGreaterThan(0);
+    expect(secretErrors).toContain('SUPABASE_SERVICE_ROLE_KEY');
   });
 });

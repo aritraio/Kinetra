@@ -26,7 +26,8 @@
     "test:db": "supabase test db",
     "smoke": "node --import tsx scripts/smoke.ts",
     "dev:configure": "node --import tsx scripts/configure-local.ts",
-    "test:security": "node --import tsx scripts/security-integration.ts"
+    "test:security": "node --import tsx scripts/security-integration.ts",
+    "test:preview": "node --import tsx scripts/verify-preview.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

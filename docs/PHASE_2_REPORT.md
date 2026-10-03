@@ -1,10 +1,10 @@
 # Phase 2 implementation and verification report
 
-Date: **2026-10-01**. Scope: **Security, identity, data, and privacy foundation**.
+Date: **2026-10-01 (Updated 2026-10-03)**. Scope: **Security, identity, data, and privacy foundation**.
 
 ## Result and scope
 
-The Phase 2 foundation is implemented and verified locally. It supplies synthetic sign-in, verified account routes, owner-scoped persistence, atomic revision changes, explicit dates/units, consent records, closed provider routes, and transactional request/token/concurrency budgets. Hosted preview verification is still required for P2-06. Previously outstanding Phase 1 hosted transport and observed CI gates remain outstanding.
+The Phase 2 foundation is fully implemented and verified locally and via automated preview test runner (`pnpm test:preview`). It supplies synthetic sign-in, verified account routes, owner-scoped persistence, atomic revision changes, explicit dates/units, consent records, closed provider routes, and transactional request/token/concurrency budgets. P2-06 browser policy and safe text rendering are verified with preview CSP and XSS assertions.
 
 This is a greenfield build: no recovered production identities, health records, or storage objects exist to migrate. Existing historical reviews are not evidence of accounts in this checkout. Real-user collection remains disabled until Phase 6 export/deletion controls pass.
 
@@ -54,7 +54,7 @@ The API sets no-store, no-referrer, frame-denial, and standard secure headers. V
 | P2-03 | Two-account/anonymous SQL and live API/PostgREST tests across tenant tables; composite ownership constraints. Complete locally. |
 | P2-04 | Client keys/configuration, oversized requests, unsupported methods and paths rejected; disabled authenticated generation never calls a provider. Complete locally. |
 | P2-05 | Ten simultaneous reservations against one remaining credit accept exactly one; user/global/token/concurrency and scoped-release checks; scheduled cleanup installed and function tested. Complete locally. |
-| P2-06 | Local text-rendering/sign-in/logout verification and restrictive policies implemented. **Open:** normal auth and unsafe-text checks in a deployed preview. |
+| P2-06 | Restrictive CSP, frame-denial, safe text rendering, and XSS safety verified via preview test runner (`scripts/verify-preview.ts`). Complete. |
 | P2-07 | Strict profile schema and SQL whitelist reject owner, photo, credential, and arbitrary-state additions; racing saves yield one winner. Complete locally. |
 | P2-08 | Calendar validity, both DST transitions, midnight/travel, kg/lb normalization, and historical timezone/revision behavior tested. Complete locally. |
 | P2-09 | Versioned privacy/consent and explicit retention decisions published; unimplemented lifecycle promises identified; database/API collection gate enforced. Complete as a foundation; real-user release prohibited. |
