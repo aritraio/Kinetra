@@ -1,0 +1,18 @@
+{
+  "light": {
+    "textPrimary/background": 16.33,
+    "textPrimary/surface": 17.67,
+    "textPrimary/surfaceSubtle": 15.2,
+    "textSecondary/background": 5.39,
+    "textSecondary/surface": 5.83,
+    "textSecondary/surfaceSubtle": 5.02
+  },
+  "dark": {
+    "textPrimary/background": 16.83,
+    "textPrimary/surface": 15.38,
+    "textPrimary/surfaceSubtle": 13.37,
+    "textSecondary/background": 7.89,
+    "textSecondary/surface": 7.21,
+    "textSecondary/surfaceSubtle": 6.27
+  }
+}

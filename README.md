@@ -173,6 +173,8 @@ pnpm db:stop
 
 ## Key Documentation
 
+- [design/README.md](design/README.md) - Complete monochrome web and future Android design atlas: 54 screens in light and dark themes, with editable mockups, PNGs, diagrams, and implementation guidance.
+
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - System topology, data models, state machine, and design patterns.
 - [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md) - Step-by-step deliverable checklist for all 6 phases.
 - [docs/PHASE_3_REPORT.md](docs/PHASE_3_REPORT.md) - Full evidence and verification report for the current Phase 3 build.

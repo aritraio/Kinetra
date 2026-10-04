@@ -1,0 +1,434 @@
+[
+  {
+    "id": "welcome",
+    "title": "Move with intention.",
+    "sub": "A clear plan. A steady routine. Progress you can see.",
+    "category": "Start",
+    "nav": "today",
+    "stage": "Phase 5"
+  },
+  {
+    "id": "signup",
+    "title": "Start your daily practice.",
+    "sub": "Create an account before setting up your routine.",
+    "category": "Start",
+    "nav": "today",
+    "stage": "Phase 2 / 5"
+  },
+  {
+    "id": "verify-email",
+    "title": "Confirm your email.",
+    "sub": "One step before your profile setup.",
+    "category": "Start",
+    "nav": "today",
+    "stage": "Phase 2 / 5"
+  },
+  {
+    "id": "new-password",
+    "title": "Choose a new password.",
+    "sub": "Password recovery · valid email-link state",
+    "category": "Start",
+    "nav": "today",
+    "stage": "Phase 2 / 5"
+  },
+  {
+    "id": "signin",
+    "title": "Welcome back.",
+    "sub": "Pick up where you left off.",
+    "category": "Start",
+    "nav": "today",
+    "stage": "Phase 2 / 5"
+  },
+  {
+    "id": "reset",
+    "title": "A fresh start.",
+    "sub": "Get back to your routine.",
+    "category": "Start",
+    "nav": "today",
+    "stage": "Phase 5"
+  },
+  {
+    "id": "reset-sent",
+    "title": "Check your inbox.",
+    "sub": "Your next step is in your email.",
+    "category": "Start",
+    "nav": "today",
+    "stage": "Phase 5"
+  },
+  {
+    "id": "onboard-goal",
+    "title": "What are you working toward?",
+    "sub": "Choose the direction that fits you today.",
+    "category": "Onboarding",
+    "nav": "today",
+    "stage": "Phase 5"
+  },
+  {
+    "id": "onboard-body",
+    "title": "Set your starting point.",
+    "sub": "A few measurements help us estimate your needs.",
+    "category": "Onboarding",
+    "nav": "measure",
+    "stage": "Phase 5"
+  },
+  {
+    "id": "onboard-preferences",
+    "title": "Make it fit your life.",
+    "sub": "Your food preferences and available equipment.",
+    "category": "Onboarding",
+    "nav": "plan",
+    "stage": "Phase 5"
+  },
+  {
+    "id": "onboard-review",
+    "title": "Your foundation is ready.",
+    "sub": "Review your inputs before creating a plan.",
+    "category": "Onboarding",
+    "nav": "plan",
+    "stage": "Phase 5"
+  },
+  {
+    "id": "today",
+    "title": "Find your rhythm, Maya.",
+    "sub": "Monday, 21 September · Week 1 of your routine",
+    "category": "Daily",
+    "nav": "today",
+    "stage": "Phase 3 / 5"
+  },
+  {
+    "id": "daily-log",
+    "title": "Capture today.",
+    "sub": "21 September · America/New_York · draft preserved",
+    "category": "Daily",
+    "nav": "today",
+    "stage": "Phase 3 / 5"
+  },
+  {
+    "id": "log-saved",
+    "title": "One more day recorded.",
+    "sub": "Daily log · 21 September",
+    "category": "Daily",
+    "nav": "today",
+    "stage": "Phase 5"
+  },
+  {
+    "id": "nutrition",
+    "title": "A plan for your plate.",
+    "sub": "Pescatarian · shellfish excluded · version 1",
+    "category": "Plan",
+    "nav": "plan",
+    "stage": "Phase 3 / 5"
+  },
+  {
+    "id": "meal",
+    "title": "Greek yogurt & oats.",
+    "sub": "Breakfast · Monday · planned meal",
+    "category": "Plan",
+    "nav": "plan",
+    "stage": "Phase 3 / 5"
+  },
+  {
+    "id": "training",
+    "title": "Train with a clear plan.",
+    "sub": "4-day Upper / Lower · intermediate · version 1",
+    "category": "Plan",
+    "nav": "plan",
+    "stage": "Phase 3 / 5"
+  },
+  {
+    "id": "exercise",
+    "title": "Barbell bench press.",
+    "sub": "Upper body A · exercise 01 of 04",
+    "category": "Training",
+    "nav": "plan",
+    "stage": "Phase 5"
+  },
+  {
+    "id": "session",
+    "title": "Focus on this set.",
+    "sub": "Upper body A · 12:36 elapsed · session draft",
+    "category": "Training",
+    "nav": "plan",
+    "stage": "Phase 5"
+  },
+  {
+    "id": "session-complete",
+    "title": "Good work. Take a breath.",
+    "sub": "Upper body A · Monday, 21 September",
+    "category": "Training",
+    "nav": "progress",
+    "stage": "Phase 5"
+  },
+  {
+    "id": "measure",
+    "title": "Understand your baseline.",
+    "sub": "Measurements and transparent energy estimates",
+    "category": "Measure",
+    "nav": "measure",
+    "stage": "Phase 3 / 5"
+  },
+  {
+    "id": "calculation",
+    "title": "See what’s behind the number.",
+    "sub": "Calculation assumptions · inspectable estimates",
+    "category": "Measure",
+    "nav": "measure",
+    "stage": "Phase 3 / 5"
+  },
+  {
+    "id": "progress",
+    "title": "Progress, with perspective.",
+    "sub": "18 September – 1 October · synthetic 14-day history",
+    "category": "Progress",
+    "nav": "progress",
+    "stage": "Phase 3 / 5"
+  },
+  {
+    "id": "history",
+    "title": "Every entry tells a little story.",
+    "sub": "Your daily log history · edit without losing context",
+    "category": "Progress",
+    "nav": "progress",
+    "stage": "Phase 3 / 5"
+  },
+  {
+    "id": "strength",
+    "title": "Strength in the details.",
+    "sub": "Training history · completed work only",
+    "category": "Progress",
+    "nav": "progress",
+    "stage": "Phase 3 / 5"
+  },
+  {
+    "id": "coach",
+    "title": "A little guidance goes a long way.",
+    "sub": "Coach · context from your selected plan and recent logs",
+    "category": "Coach",
+    "nav": "coach",
+    "stage": "Phase 4 / 9"
+  },
+  {
+    "id": "coach-streaming",
+    "title": "Coach is reviewing your context.",
+    "sub": "Streaming response · cancellation is always available",
+    "category": "Coach",
+    "nav": "coach",
+    "stage": "Phase 4 / 9"
+  },
+  {
+    "id": "form-setup",
+    "title": "Move. See. Adjust.",
+    "sub": "Form Lab · squat only · local camera analysis",
+    "category": "Form Lab",
+    "nav": "lab",
+    "stage": "Phase 7"
+  },
+  {
+    "id": "form-active",
+    "title": "Keep the movement in view.",
+    "sub": "Squat session · camera active on this device",
+    "category": "Form Lab",
+    "nav": "lab",
+    "stage": "Phase 7"
+  },
+  {
+    "id": "form-low",
+    "title": "Let’s get a clearer view.",
+    "sub": "Form Lab · tracking paused",
+    "category": "Form Lab",
+    "nav": "lab",
+    "stage": "Phase 7"
+  },
+  {
+    "id": "form-summary",
+    "title": "A moment to reflect.",
+    "sub": "Form Lab session ended · camera released",
+    "category": "Form Lab",
+    "nav": "lab",
+    "stage": "Phase 7"
+  },
+  {
+    "id": "more",
+    "title": "Your toolkit.",
+    "sub": "A few more ways to understand your routine.",
+    "category": "Account",
+    "nav": "more",
+    "stage": "Phase 5 / Android concept"
+  },
+  {
+    "id": "settings",
+    "title": "Make Kinetra yours.",
+    "sub": "Maya Lin · synthetic account",
+    "category": "Account",
+    "nav": "more",
+    "stage": "Phase 5 / 6"
+  },
+  {
+    "id": "appearance",
+    "title": "Clarity in any light.",
+    "sub": "Appearance · consistent across every destination",
+    "category": "Account",
+    "nav": "more",
+    "stage": "Phase 5"
+  },
+  {
+    "id": "reminders",
+    "title": "A gentle nudge.",
+    "sub": "Reminders follow your local day.",
+    "category": "Account",
+    "nav": "more",
+    "stage": "Phase 5"
+  },
+  {
+    "id": "privacy",
+    "title": "Your data. Your choices.",
+    "sub": "Account controls and transparent consent",
+    "category": "Account",
+    "nav": "more",
+    "stage": "Phase 6"
+  },
+  {
+    "id": "export",
+    "title": "Take your records with you.",
+    "sub": "Portable account export",
+    "category": "Account",
+    "nav": "more",
+    "stage": "Phase 6"
+  },
+  {
+    "id": "delete-account",
+    "title": "Review before you leave.",
+    "sub": "Account deletion · explicit confirmation",
+    "category": "Account",
+    "nav": "more",
+    "stage": "Phase 6"
+  },
+  {
+    "id": "sync",
+    "title": "Stay connected to your routine.",
+    "sub": "Offline status and pending changes",
+    "category": "Offline",
+    "nav": "more",
+    "stage": "Phase 6"
+  },
+  {
+    "id": "conflict",
+    "title": "Keep the right version.",
+    "sub": "21 September · this day changed on another device",
+    "category": "Offline",
+    "nav": "more",
+    "stage": "Phase 6"
+  },
+  {
+    "id": "generating",
+    "title": "Building a plan you can inspect.",
+    "sub": "Your previous accepted plan stays available.",
+    "category": "Plan states",
+    "nav": "plan",
+    "stage": "Phase 4"
+  },
+  {
+    "id": "generation-failed",
+    "title": "Your current plan is still here.",
+    "sub": "A new plan could not be accepted.",
+    "category": "Plan states",
+    "nav": "plan",
+    "stage": "Phase 4"
+  },
+  {
+    "id": "plan-revision",
+    "title": "Adjust with intention.",
+    "sub": "Nutrition plan v1 · revision request",
+    "category": "Plan",
+    "nav": "plan",
+    "stage": "Phase 5"
+  },
+  {
+    "id": "versions",
+    "title": "Keep the story of your plan.",
+    "sub": "Immutable versions · nutrition",
+    "category": "Plan",
+    "nav": "plan",
+    "stage": "Phase 5"
+  },
+  {
+    "id": "share",
+    "title": "Share just the plan.",
+    "sub": "Nutrition · immutable version 2",
+    "category": "Plan",
+    "nav": "plan",
+    "stage": "Phase 9"
+  },
+  {
+    "id": "voice",
+    "title": "Say it. Review it. Save it.",
+    "sub": "Voice entry · editable confirmation before any save",
+    "category": "Daily",
+    "nav": "today",
+    "stage": "Phase 9"
+  },
+  {
+    "id": "progression",
+    "title": "Review your next step.",
+    "sub": "Proposed training adjustment · no automatic change",
+    "category": "Training",
+    "nav": "progress",
+    "stage": "Phase 8"
+  },
+  {
+    "id": "photos",
+    "title": "Private, and entirely optional.",
+    "sub": "Progress photos · future feature preview",
+    "category": "Progress",
+    "nav": "progress",
+    "stage": "Phase 9"
+  },
+  {
+    "id": "empty",
+    "title": "Your routine starts here.",
+    "sub": "Today · new account with no accepted plan",
+    "category": "System states",
+    "nav": "today",
+    "stage": "Phase 5"
+  },
+  {
+    "id": "loading",
+    "title": "Your day is coming into focus.",
+    "sub": "Today · loading your saved records",
+    "category": "System states",
+    "nav": "today",
+    "stage": "Phase 5"
+  },
+  {
+    "id": "error",
+    "title": "Let’s reconnect.",
+    "sub": "Saved content remains available when cached.",
+    "category": "System states",
+    "nav": "today",
+    "stage": "Phase 5 / 6"
+  },
+  {
+    "id": "validation",
+    "title": "A small correction, then you’re set.",
+    "sub": "Daily log · validation preserves the rest of your draft",
+    "category": "System states",
+    "nav": "today",
+    "stage": "Phase 5"
+  },
+  {
+    "id": "permission",
+    "title": "You can continue without a camera.",
+    "sub": "Form Lab · camera permission denied",
+    "category": "System states",
+    "nav": "lab",
+    "stage": "Phase 7"
+  },
+  {
+    "id": "expired",
+    "title": "Sign in to finish syncing.",
+    "sub": "Session expired · local changes remain preserved",
+    "category": "System states",
+    "nav": "more",
+    "stage": "Phase 6"
+  }
+]
