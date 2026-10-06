@@ -1653,3 +1653,128 @@ button:not(.option):not(.day) {
 .hero {
   border-color: #171918;
 }
+/* Equal calendar columns with weekday and date on shared baselines. */
+.calendar-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+.day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  min-height: 64px;
+  padding: 8px 0;
+}
+.day-label,
+.day time {
+  display: block;
+  width: 100%;
+  line-height: 20px;
+  text-align: center;
+  font-size: var(--text-body);
+  font-variant-numeric: tabular-nums;
+}
+.day-label {
+  color: var(--muted);
+}
+.day.active .day-label {
+  color: inherit;
+}
+.day time {
+  color: var(--ink);
+}
+.day.active time {
+  color: var(--inverse);
+}
+.plan-date {
+  font-size: var(--text-support);
+  margin: -8px 0 20px;
+}
+.week-entry .list-row {
+  padding: 16px 0;
+}
+.week-selection.hidden {
+  visibility: hidden;
+}
+.week-entry.selected h3 {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.list-main {
+  min-width: 0;
+}
+.list-main h3,
+.list-main p {
+  overflow-wrap: anywhere;
+}
+.card-head > h2 {
+  min-width: 0;
+}
+.card-head > .btn,
+.list-row > .btn,
+.list-row > .badge {
+  flex-shrink: 0;
+}
+.photo-tape .exercise-photo-frame {
+  aspect-ratio: 3 / 2;
+}
+.photo-tape img {
+  height: 100%;
+  object-fit: cover;
+}
+@media (max-width: 380px) {
+  .days {
+    gap: 4px;
+  }
+  .calendar-heading {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 900px) {
+  .table {
+    table-layout: fixed;
+  }
+  .table th,
+  .table td {
+    text-align: center;
+    padding: 12px 3px;
+  }
+  .table th:first-child {
+    width: 10%;
+  }
+  .table th:last-child {
+    width: 22%;
+  }
+  .table td:first-child,
+  .table td:last-child {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .table td input {
+    width: 100%;
+    min-width: 0;
+    padding: 10px 4px;
+    text-align: center;
+  }
+}
+.field-label {
+  display: block;
+  line-height: 18px;
+}
+@media (max-width: 380px) {
+  .fields > .field .field-label {
+    min-height: 36px;
+  }
+}

@@ -107,7 +107,16 @@ const gallery = await page.evaluate(() => ({
 await page.screenshot({ path: path.join(root, 'gallery-preview.png'), fullPage: true });
 await page.setViewportSize({ width: 390, height: 844 });
 const narrow = [];
-for (const id of ['today', 'session', 'measure', 'coach', 'conflict', 'onboard-body']) {
+for (const id of [
+  'today',
+  'session',
+  'measure',
+  'coach',
+  'conflict',
+  'onboard-body',
+  'nutrition',
+  'training',
+]) {
   await page.goto(`${base}/mockups/web/light/${id}.html`, { waitUntil: 'load' });
   narrow.push({
     id,
@@ -117,6 +126,51 @@ for (const id of ['today', 'session', 'measure', 'coach', 'conflict', 'onboard-b
 await page.goto(`${base}/mockups/android/light/session.html`, { waitUntil: 'load' });
 await page.locator('[data-set]').nth(1).click();
 const setInteraction = (await page.locator('tr.completed').count()) === 2;
+const calendarChecks = [];
+for (const platform of ['web', 'android'])
+  for (const theme of ['light', 'dark'])
+    for (const id of ['nutrition', 'training']) {
+      await page.setViewportSize(
+        platform === 'web' ? { width: 1440, height: 1000 } : { width: 412, height: 915 },
+      );
+      await page.goto(`${base}/mockups/${platform}/${theme}/${id}.html`, { waitUntil: 'load' });
+      for (let index = 0; index < 7; index++) {
+        await page.locator('[data-day]').nth(index).click();
+        const check = await page.evaluate(() => {
+          const buttons = [...document.querySelectorAll('[data-day]')];
+          const selected = buttons.find((button) => button.getAttribute('aria-pressed') === 'true');
+          const date = document.querySelector('[data-plan-day] time');
+          const heading = document.querySelector('[data-selected-day]');
+          const labelTops = buttons.map(
+            (button) => button.querySelector('.day-label').getBoundingClientRect().top,
+          );
+          const numberTops = buttons.map(
+            (button) => button.querySelector('time').getBoundingClientRect().top,
+          );
+          const widths = buttons.map((button) => button.getBoundingClientRect().width);
+          const validDates = buttons.every((button) => {
+            const iso = button.dataset.date;
+            const date = new Date(`${iso}T12:00:00Z`);
+            return (
+              button.querySelector('.day-label').textContent ===
+                new Intl.DateTimeFormat('en', { weekday: 'short', timeZone: 'UTC' }).format(date) &&
+              Number(button.querySelector('time').textContent) === date.getUTCDate()
+            );
+          });
+          return {
+            validDates,
+            matchedSelection:
+              selected.dataset.date === date.getAttribute('datetime') &&
+              selected.dataset.date === heading.dataset.selectedDay,
+            aligned:
+              Math.max(...labelTops) - Math.min(...labelTops) < 1 &&
+              Math.max(...numberTops) - Math.min(...numberTops) < 1 &&
+              Math.max(...widths) - Math.min(...widths) < 1,
+          };
+        });
+        calendarChecks.push({ platform, theme, id, index, ...check });
+      }
+    }
 await browser.close();
 const issues = results.filter(
   (r) =>
@@ -138,6 +192,7 @@ fs.writeFileSync(
       gallery,
       narrow,
       setInteraction,
+      calendarChecks,
       results,
     },
     null,
@@ -147,4 +202,10 @@ fs.writeFileSync(
 console.log(
   JSON.stringify({ mockups: results.length, issues, narrow, setInteraction, gallery }, null, 2),
 );
-if (issues.length || narrow.some((r) => r.overflow) || !setInteraction) process.exitCode = 1;
+if (
+  issues.length ||
+  narrow.some((r) => r.overflow) ||
+  !setInteraction ||
+  calendarChecks.some((c) => !c.validDates || !c.matchedSelection || !c.aligned)
+)
+  process.exitCode = 1;

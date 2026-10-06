@@ -79,7 +79,7 @@ Exercise demos use locally stored photographs from Pexels: bench press by Andrea
 
 Bench-press reference imagery appears in Today and the exercise guide. The side-view squat reference appears in the welcome hero, Form Lab setup, preview, and summary. Form Lab explicitly labels a stock photo preview; sample observations are illustrative, with no live tracking or fabricated landmark overlay. Production will replace that preview with the actual local camera view.
 
-Measurement tape placement, meal composition, and data charts keep their informational vectors. These are functional explanations rather than exercise demo illustrations. The removed bench/squat vector assets are no longer part of the handoff.
+Measure uses a grayscale waist-measurement photograph by Gustavo Fring with reference labeling and source attribution. There are no human vector illustrations. Meal composition and data charts keep their informational vectors. These are functional explanations rather than exercise demo illustrations. The removed bench/squat/tape-placement vector assets are no longer part of the handoff.
 
 ## Accessibility and motion
 
@@ -92,3 +92,9 @@ Honor reduced motion. Use brief state transitions during implementation; avoid l
 The type scale is shared across web and Android and both themes. Page-specific control font sizes and smaller hero action labels have been removed. All card titles use the section role; all grouped metrics use the metric role. Macro values use the body/control role to keep three-column summaries readable without introducing an extra intermediate size. The logo and simulated system chrome sit outside the content hierarchy.
 
 Widths follow label content and available space; action heights, label size, padding, weight, and icon size are consistent. Long action rows wrap as whole controls rather than squeezing the text. Selected choice cards preserve their outer size by compensating for the additional border width.
+
+## Calendar and layout revision
+
+The plan week uses one explicit date source: Monday 21 through Sunday 27 September 2026. Seven equal columns place weekday labels above their date numbers, with tabular figures and aligned baselines. Selecting a day updates the displayed date, panel heading, training/rest content, and matching weekly-summary selection. Month and year stay visible above the selector. This fixed synthetic week is labeled as a demo.
+
+Narrow workout tables center column labels and values and size inputs to their column so set data stays aligned at 320 px. Long activity choices have concise labels; the calculation panel retains the multiplier details.

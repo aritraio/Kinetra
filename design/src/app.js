@@ -1,4 +1,4 @@
-import { screens, icon } from './screens.js';
+import { screens, icon, planDay, planWeek } from './screens.js';
 const { screen: id = 'today', platform = 'web', theme = 'light' } = document.body.dataset;
 const screen = screens.find((s) => s.id === id) || screens.find((s) => s.id === 'today');
 const destinations = [
@@ -33,14 +33,15 @@ style.textContent =
 document.head.append(style);
 for (const button of document.querySelectorAll('button')) button.type = 'button';
 // Relative links preserve the current platform and theme. Clickthrough is illustrative.
-for (const a of document.querySelectorAll('a[href]')) {
-  const target = a.getAttribute('href');
-  if (screens.some((s) => s.id === target)) {
-    a.href = `${target}.html`;
-  } else if (target === '#') {
-    a.setAttribute('data-demo', 'true');
+function linkScreens(root = document) {
+  for (const a of root.querySelectorAll('a[href]')) {
+    const target = a.getAttribute('href');
+    if (screens.some((s) => s.id === target)) a.href = `${target}.html`;
+    else if (target === '#') a.setAttribute('data-demo', 'true');
   }
+  for (const button of root.querySelectorAll('button')) button.type = 'button';
 }
+linkScreens();
 function toast(message) {
   document.querySelector('.toast')?.remove();
   const t = document.createElement('div');
@@ -70,9 +71,22 @@ document.addEventListener('click', (e) => {
   } else if (c.hasAttribute('data-day')) {
     c.parentElement.querySelectorAll('[data-day]').forEach((x) => {
       x.classList.remove('active');
+      x.setAttribute('aria-pressed', 'false');
     });
     c.classList.add('active');
-    toast('Prototype: day selected. Sample content remains illustrative.');
+    c.setAttribute('aria-pressed', 'true');
+    const index = Number(c.dataset.day);
+    const day = planWeek[index];
+    const content = document.querySelector('[data-plan-day]');
+    if (content) {
+      content.innerHTML = planDay(content.dataset.planDay, index);
+      linkScreens(content);
+    }
+    for (const entry of document.querySelectorAll('[data-week-date]')) {
+      const selected = entry.dataset.weekDate === day.iso;
+      entry.classList.toggle('selected', selected);
+      entry.querySelector('.week-selection').classList.toggle('hidden', !selected);
+    }
   } else {
     toast('Design prototype: this action does not save or send data.');
   }

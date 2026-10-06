@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { screens, movement, chart } from './screens.js';
+import { screens, chart } from './screens.js';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 for (const platform of ['web', 'android'])
   for (const theme of ['light', 'dark']) {
@@ -22,7 +22,6 @@ fs.writeFileSync(
   )}\n`,
 );
 for (const [name, svg] of [
-  ['tape-placement', movement('tape')],
   ['weight-trend', chart()],
   ['strength-trend', chart(true)],
 ]) {

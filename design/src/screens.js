@@ -33,6 +33,12 @@ const paths = {
 export const icon = (name) =>
   `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[name] || paths.arrow}"/></svg>`;
 const exercisePhotos = {
+  tape: {
+    file: 'waist-measurement.jpg',
+    alt: 'Close-up of a waist measurement with a tape measure',
+    credit: 'Gustavo Fring',
+    source: 'https://www.pexels.com/photo/woman-measuring-waist-with-tape-measure-5622199/',
+  },
   bench: {
     file: 'bench-press.jpg',
     alt: 'Athlete performing a bench press in a gym',
@@ -48,12 +54,10 @@ const exercisePhotos = {
   },
 };
 export const movement = (mode = 'squat', variant = 'exercise-photo') => {
-  if (mode === 'tape')
-    return `<svg class="diagram" viewBox="0 0 400 260" role="img" aria-label="Tape placement at neck, waist, and hips"><path class="body" d="M185 54c-30 12-42 41-38 69l10 83m28-143-13 71 4 101m40-181c30 12 42 41 38 69l-10 83m-28-143 13 71-4 101M176 133h52"/><circle class="body" cx="201" cy="31" r="19"/><path class="guide" d="M167 62h70M162 112h77M155 151h88"/><path class="guide" d="M55 62h110M55 112h105M55 151h98"/><text x="52" y="52">01 / NECK</text><text x="52" y="102">02 / WAIST</text><text x="52" y="141">03 / HIPS</text><text x="272" y="214">TAPE LEVEL</text></svg>`;
   const photo = exercisePhotos[mode] || exercisePhotos.squat;
   if (variant === 'hero-figure')
     return `<div class="hero-photo photo-${mode}" aria-hidden="true"><img src="../../../assets/photos/${photo.file}" alt=""></div>`;
-  return `<figure class="exercise-photo photo-${mode}"><div class="exercise-photo-frame"><img src="../../../assets/photos/${photo.file}" alt="${photo.alt}" width="${mode === 'bench' ? 1600 : 1200}" height="${mode === 'bench' ? 1067 : 1800}"></div><figcaption><span>${mode === 'bench' ? 'Bench press' : 'Side-view squat'} · reference photo</span><a href="${photo.source}" target="_blank" rel="noreferrer">${photo.credit} / Pexels ↗</a></figcaption></figure>`;
+  return `<figure class="exercise-photo photo-${mode}"><div class="exercise-photo-frame"><img src="../../../assets/photos/${photo.file}" alt="${photo.alt}" width="${mode === 'bench' ? 1600 : 1200}" height="${mode === 'bench' ? 1067 : mode === 'tape' ? 800 : 1800}"></div><figcaption><span>${mode === 'bench' ? 'Bench press' : mode === 'tape' ? 'Waist measurement' : 'Side-view squat'} · reference photo</span><a href="${photo.source}" target="_blank" rel="noreferrer">${photo.credit} / Pexels ↗</a></figcaption></figure>`;
 };
 export const chart = (strength = false) =>
   `<svg class="chart" viewBox="0 0 620 205" role="img" aria-label="${strength ? 'Bench press load increases from 40 to 42.5 kilograms over four sessions' : 'Illustrative 14-day weight trend from 68.8 to 68.0 kilograms, with daily fluctuation'}"><path class="axis" d="M45 30h552M45 85h552M45 140h552M45 177h552"/><text x="3" y="34">${strength ? '45 kg' : '69 kg'}</text><text x="3" y="89">${strength ? '42.5' : '68.5'}</text><text x="3" y="144">${strength ? '40' : '68 kg'}</text><path class="trend" opacity=".35" stroke-dasharray="5 5" d="M48 45C210 70 350 117 595 137"/><path class="trend" d="${strength ? 'M48 142 202 142 370 88 594 88' : 'M48 50 90 63 132 63 174 80 216 92 258 88 300 108 342 98 384 112 426 132 468 124 510 138 552 142 594 142'}"/><circle class="point" cx="594" cy="${strength ? 88 : 142}" r="5"/><text x="45" y="199">18 SEP</text><text x="205" y="199">22 SEP</text><text x="370" y="199">26 SEP</text><text x="559" y="199">01 OCT</text></svg>`;
@@ -61,9 +65,9 @@ const badge = (s) => `<span class="badge">${s}</span>`;
 const btn = (s, to, primary = false, ico = 'arrow') =>
   `<a class="btn ${primary ? 'primary' : ''}" href="${to || '#'}" ${to ? '' : 'data-demo="true"'}>${s}${icon(ico)}</a>`;
 const field = (label, value, type = 'text', note = '') =>
-  `<label class="field">${label}<input type="${type}" value="${value}" ${type === 'number' ? 'step="any"' : ''}>${note ? `<small>${note}</small>` : ''}</label>`;
+  `<label class="field"><span class="field-label">${label}</span><input type="${type}" value="${value}" ${type === 'number' ? 'step="any"' : ''}>${note ? `<small>${note}</small>` : ''}</label>`;
 const select = (label, opts) =>
-  `<label class="field">${label}<select>${opts.map((x) => `<option>${x}</option>`).join('')}</select></label>`;
+  `<label class="field"><span class="field-label">${label}</span><select>${opts.map((x) => `<option>${x}</option>`).join('')}</select></label>`;
 const card = (title, body, aside = '', extra = '') =>
   `<section class="card ${extra}">${title ? `<div class="card-head"><h2>${title}</h2>${aside}</div>` : ''}${body}</section>`;
 const stat = (v, label, unit = '') =>
@@ -73,8 +77,23 @@ const row = (title, sub, right = '', n = '') =>
   `<div class="list-row">${n ? `<span class="number">${n}</span>` : ''}<div class="list-main"><h3>${title}</h3><p>${sub}</p></div>${right}</div>`;
 const tabs = (labels, active) =>
   `<div class="tabs">${labels.map(([s, to]) => `<a class="${s === active ? 'active' : ''}" href="${to}">${s}</a>`).join('')}</div>`;
+export const planWeek = Array.from({ length: 7 }, (_, index) => {
+  const date = new Date(Date.UTC(2026, 8, 21 + index));
+  return {
+    iso: date.toISOString().slice(0, 10),
+    weekday: new Intl.DateTimeFormat('en', { weekday: 'long', timeZone: 'UTC' }).format(date),
+    short: new Intl.DateTimeFormat('en', { weekday: 'short', timeZone: 'UTC' }).format(date),
+    number: date.getUTCDate(),
+    label: new Intl.DateTimeFormat('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(date),
+  };
+});
 const days = () =>
-  `<div class="days">${['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => `<button class="day ${i === 0 ? 'active' : ''}" data-day>${d}<b>${21 + i}</b></button>`).join('')}</div>`;
+  `<section class="calendar" aria-label="Plan week"><div class="calendar-heading"><span class="eyebrow">DEMO WEEK</span><span class="small">21–27 September 2026</span></div><div class="days">${planWeek.map((day, index) => `<button type="button" class="day ${index === 0 ? 'active' : ''}" data-day="${index}" data-date="${day.iso}" aria-label="${day.weekday}, ${day.label}" aria-pressed="${index === 0}"><span class="day-label">${day.short}</span><time datetime="${day.iso}">${day.number}</time></button>`).join('')}</div></section>`;
 const check = (s, checked = true) =>
   `<label class="check-row"><input type="checkbox" ${checked ? 'checked' : ''}>${s}</label>`;
 const macro = () =>
@@ -99,6 +118,40 @@ const mealrows = () =>
   row('Greek yogurt & oats', 'Breakfast · 07:30 · planned', btn('View', 'meal'), '01') +
   row('Tofu & quinoa bowl', 'Lunch · 12:30 · planned', badge('Pescatarian'), '02') +
   row('Salmon & rice', 'Dinner · 19:00 · planned', btn('View', 'meal'), '03');
+const trainingFocus = [
+  'Upper body A',
+  'Lower body A',
+  'Rest & recovery',
+  'Upper body B',
+  'Lower body B',
+  'Rest & recovery',
+  'Rest & recovery',
+];
+export const planDay = (kind, index = 0) => {
+  const day = planWeek[index];
+  const date = `<p class="plan-date"><time datetime="${day.iso}">${day.weekday}, ${day.label}</time></p>`;
+  const selected = `<span data-selected-day="${day.iso}">${kind === 'nutrition' ? `${day.weekday}’s meals` : trainingFocus[index]}</span>`;
+  if (kind === 'nutrition') return card(selected, date + mealrows(), badge('Planned'));
+  const rest = [2, 5, 6].includes(index);
+  const lower = [1, 4].includes(index);
+  const body = rest
+    ? `<p>No lifting session planned. Resume with the next training day in your weekly plan.</p>`
+    : lower
+      ? row(
+          'Squat',
+          '3 sets × 8–10 reps · illustrative prescription',
+          btn('View guide', 'form-setup'),
+          '01',
+        ) +
+        row('Dumbbell Romanian deadlift', '3 sets × 10 reps', badge('90 s rest'), '02') +
+        row('Split squat', '3 sets × 10 reps', badge('90 s rest'), '03')
+      : workouts();
+  return card(
+    selected,
+    date + body,
+    badge(rest ? 'Rest day' : lower ? '3 exercises' : '4 exercises'),
+  );
+};
 const options = (data) =>
   data
     .map(
@@ -255,7 +308,7 @@ export const screens = [
   {
     id: 'today',
     title: 'Find your rhythm, Maya.',
-    sub: 'Monday, 21 September · Week 1 of your routine',
+    sub: 'Monday, 21 September 2026 · Demo week 1',
     category: 'Daily',
     nav: 'today',
     stage: 'Phase 3 / 5',
@@ -308,12 +361,12 @@ export const screens = [
           ['Training', 'training'],
         ],
         'Nutrition',
-      )}${days()}<div class="grid"><div class="stack">${card('Monday’s meals', mealrows(), badge('Planned'))}${card('Keep your plan flexible', `<p>Changes create a new version after review. Keep this plan available while a revision is prepared.</p><div class="mt row wrap">${btn('Request revision', 'plan-revision')}${btn('Version history', 'versions')}</div>`)}</div><div class="stack">${card('Daily targets', `<div class="stat">1,750 <small>kcal</small></div><p class="note">Illustrative estimated target</p><div class="divider"></div><div class="stats">${stat('135', 'Protein', 'g')}${stat('160', 'Carbs', 'g')}${stat('48', 'Fat', 'g')}</div>`)}${card('Plan provenance', `${row('Synthetic fixture', 'Demo content · not an AI verification result', badge('Demo'))}${row('Source ingredients', 'Catalog provenance can be inspected per meal.')}${btn('View meal details', 'meal')}`)}</div></div>`,
+      )}${days()}<div class="grid"><div class="stack"><div data-plan-day="nutrition">${planDay('nutrition')}</div>${card('Keep your plan flexible', `<p>Changes create a new version after review. Keep this plan available while a revision is prepared.</p><div class="mt row wrap">${btn('Request revision', 'plan-revision')}${btn('Version history', 'versions')}</div>`)}</div><div class="stack">${card('Daily targets', `<div class="stat">1,750 <small>kcal</small></div><p class="note">Illustrative estimated target</p><div class="divider"></div><div class="stats">${stat('135', 'Protein', 'g')}${stat('160', 'Carbs', 'g')}${stat('48', 'Fat', 'g')}</div>`)}${card('Plan provenance', `${row('Synthetic fixture', 'Demo content · not an AI verification result', badge('Demo'))}${row('Source ingredients', 'Catalog provenance can be inspected per meal.')}${btn('View meal details', 'meal')}`)}</div></div>`,
   },
   {
     id: 'meal',
     title: 'Greek yogurt & oats.',
-    sub: 'Breakfast · Monday · planned meal',
+    sub: 'Breakfast · planned meal reference',
     category: 'Plan',
     nav: 'plan',
     stage: 'Phase 3 / 5',
@@ -334,7 +387,7 @@ export const screens = [
           ['Training', 'training'],
         ],
         'Training',
-      )}${days()}<div class="grid"><div class="stack">${card('Upper body A', workouts(), badge('4 exercises'))}${card('Ready when you are', `<div class="row"><p>Log sets, load, reps, and effort.</p>${btn('Start session', 'session', true)}</div>`)}</div><div class="stack">${card('This week', `${row('Monday', 'Upper body A', badge('Today'))}${row('Tuesday', 'Lower body A')}${row('Wednesday', 'Rest')}${row('Thursday', 'Upper body B')}${row('Friday', 'Lower body B')}`)}${card(
+      )}${days()}<div class="grid"><div class="stack"><div data-plan-day="training">${planDay('training')}</div>${card('Session logger demo', `<p>Preview the Monday, 21 September session.</p><div class="mt">${btn('Open Monday session', 'session', true)}</div>`)}</div><div class="stack">${card('This week', planWeek.map((day, index) => `<div data-week-date="${day.iso}" class="week-entry ${index === 0 ? 'selected' : ''}">${row(`${day.short} · ${day.number} Sep`, trainingFocus[index], `<span class="week-selection ${index === 0 ? '' : 'hidden'}">${badge('Selected')}</span>`)}</div>`).join(''))}${card(
         'Your equipment',
         chips([
           ['Barbell', true],
@@ -381,7 +434,7 @@ export const screens = [
     nav: 'measure',
     stage: 'Phase 3 / 5',
     body: () =>
-      `<div class="grid"><div class="stack">${card('Your measurements', `<div class="fields">${field('Weight · kg', '68', 'number')}${field('Height · cm', '168', 'number')}</div><div class="fields">${field('Age · years', '28', 'number')}${select('Activity', ['Moderate · PAL 1.55', 'Light · PAL 1.375'])}</div>${btn('Calculation details', 'calculation')}`)}${card('Circumference estimate', `${movement('tape')}<div class="fields">${field('Neck · cm', '33', 'number')}${field('Waist · cm', '76', 'number')}${field('Hips · cm', '98', 'number')}</div><p class="caption">US Navy estimate · depends on correct tape placement and equation inputs. No photo-based body-fat estimate.</p>`)}</div><div class="stack">${card('Estimated energy needs', `<div class="stat">2,211 <small>kcal / day</small></div><p>Total daily energy expenditure</p><div class="divider"></div>${row('Resting estimate', 'Mifflin-St Jeor', badge('1,427 kcal'))}${row('Activity multiplier', 'Moderate activity', badge('× 1.55'))}<p class="note">Rounded illustrative calculation: 1,426.5 × 1.55 ≈ 2,211 kcal. Your activity estimate adds uncertainty.</p>`)}${card('Current plan target', `<div class="stat">1,750 <small>kcal / day</small></div><p class="note">Synthetic plan target. It is shown separately from the calculated baseline.</p>${macro()}`)}</div></div>`,
+      `<div class="grid"><div class="stack">${card('Your measurements', `<div class="fields">${field('Weight · kg', '68', 'number')}${field('Height · cm', '168', 'number')}</div><div class="fields">${field('Age · years', '28', 'number')}${select('Activity', ['Moderate', 'Light'])}</div>${btn('Calculation details', 'calculation')}`)}${card('Circumference estimate', `${movement('tape')}<div class="fields">${field('Neck · cm', '33', 'number')}${field('Waist · cm', '76', 'number')}${field('Hips · cm', '98', 'number')}</div><p class="caption">US Navy estimate · depends on correct tape placement and equation inputs. No photo-based body-fat estimate.</p>`)}</div><div class="stack">${card('Estimated energy needs', `<div class="stat">2,211 <small>kcal / day</small></div><p>Total daily energy expenditure</p><div class="divider"></div>${row('Resting estimate', 'Mifflin-St Jeor', badge('1,427 kcal'))}${row('Activity multiplier', 'Moderate activity', badge('× 1.55'))}<p class="note">Rounded illustrative calculation: 1,426.5 × 1.55 ≈ 2,211 kcal. Your activity estimate adds uncertainty.</p>`)}${card('Current plan target', `<div class="stat">1,750 <small>kcal / day</small></div><p class="note">Synthetic plan target. It is shown separately from the calculated baseline.</p>${macro()}`)}</div></div>`,
   },
   {
     id: 'calculation',
@@ -715,7 +768,7 @@ export const screens = [
     nav: 'today',
     stage: 'Phase 5',
     body: () =>
-      `<div class="grid">${card('Correct the highlighted field', `${notice('Weight needs a valid value', 'Enter a weight greater than zero in your selected unit.')}<div class="fields"><label class="field">Weight · kg<input aria-invalid="true" aria-describedby="weight-error" value="-2" type="number" style="border:2px solid var(--ink)"><small id="weight-error">! Enter a positive weight.</small></label>${field('Calories · kcal', '1750', 'number')}</div>${field('Notes', 'Good energy during training.')}<div class="actions">${btn('Return to draft', 'daily-log', true)}</div>`)}${card('Draft intact', `<p>Errors appear next to the relevant field and in a linked summary. Move focus to the summary on submit. Keep all other entered values.</p><p class="note">Save remains unavailable until required errors are resolved. Optional blank values are not converted into zero.</p>`)}</div>`,
+      `<div class="grid">${card('Correct the highlighted field', `${notice('Weight needs a valid value', 'Enter a weight greater than zero in your selected unit.')}<div class="fields"><label class="field"><span class="field-label">Weight · kg</span><input aria-invalid="true" aria-describedby="weight-error" value="-2" type="number" style="border:2px solid var(--ink)"><small id="weight-error">! Enter a positive weight.</small></label>${field('Calories · kcal', '1750', 'number')}</div>${field('Notes', 'Good energy during training.')}<div class="actions">${btn('Return to draft', 'daily-log', true)}</div>`)}${card('Draft intact', `<p>Errors appear next to the relevant field and in a linked summary. Move focus to the summary on submit. Keep all other entered values.</p><p class="note">Save remains unavailable until required errors are resolved. Optional blank values are not converted into zero.</p>`)}</div>`,
   },
   {
     id: 'permission',

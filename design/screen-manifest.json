@@ -90,7 +90,7 @@
   {
     "id": "today",
     "title": "Find your rhythm, Maya.",
-    "sub": "Monday, 21 September · Week 1 of your routine",
+    "sub": "Monday, 21 September 2026 · Demo week 1",
     "category": "Daily",
     "nav": "today",
     "stage": "Phase 3 / 5"
@@ -122,7 +122,7 @@
   {
     "id": "meal",
     "title": "Greek yogurt & oats.",
-    "sub": "Breakfast · Monday · planned meal",
+    "sub": "Breakfast · planned meal reference",
     "category": "Plan",
     "nav": "plan",
     "stage": "Phase 3 / 5"

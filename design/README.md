@@ -18,7 +18,7 @@ Use the left screen list, platform selector, and theme selector. Each screen off
 - `mockups/android/light/` and `mockups/android/dark/`: 412 dp Android concepts, rendered at 1 px/dp. Each `.png` shows the 412 × 915 viewport; `-scroll.png` companions show all scrollable content.
 - `overview-*.jpg`: contact sheets for all four combinations.
 - `direction-board.png`: side-by-side light/dark web and Android Today previews.
-- `assets/`: local exercise photographs with [source credits](assets/photos/CREDITS.md), plus editable measurement diagrams and charts.
+- `assets/`: local exercise photographs with [source credits](assets/photos/CREDITS.md), plus editable charts and supporting graphics.
 - `src/`: shared source for the atlas, screen content, layouts, and rendering.
 - `screen-manifest.json`: complete screen inventory with category and planned project phase.
 - `docs/`: rationale, design system, flows, implementation handoff, and verification evidence.
