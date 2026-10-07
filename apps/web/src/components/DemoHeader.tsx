@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useRepositoryControls } from '../repositories';
+import { ThemeToggle } from './ui';
 
 export type NavigationTab = 'today' | 'measure' | 'plan' | 'progress' | 'foundation';
 
@@ -56,6 +57,8 @@ export function DemoHeader({
           >
             {resetStatus || 'Reset Fixtures'}
           </button>
+
+          <ThemeToggle />
         </div>
       </div>
 

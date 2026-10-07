@@ -12,6 +12,7 @@ import { ProgressView } from './features/ProgressView';
 import { TodayView } from './features/TodayView';
 import { RepositoryProvider } from './repositories';
 import { consumeStream } from './stream';
+import { ThemeProvider } from './theme';
 import './styles.css';
 
 function FoundationPanel() {
@@ -156,6 +157,8 @@ if (!root) throw new Error('Missing application root');
 
 createRoot(root).render(
   <QueryClientProvider client={new QueryClient()}>
-    <RouterProvider router={router} />
+    <ThemeProvider>
+      <RouterProvider router={router} />
+    </ThemeProvider>
   </QueryClientProvider>,
 );
