@@ -16,3 +16,4 @@ export * from './meal-verifier';
 export * from './workout-verifier';
 export * from './fallback-templates';
 export * from './posture';
+export * from './progression';

@@ -186,13 +186,13 @@ Local implementation and acceptance evidence: [Phase 2 report](PHASE_2_REPORT.md
 
 **Dependencies:** verified workout plans and sufficient training-history schema. **Output:** conservative, reviewable next-plan adjustments.
 
-- [ ] **P8-01 — Define a versioned progression policy.** Document required history, effort scale, missed-session treatment, plateau criteria, progression/deload bounds, and excluded populations/scenarios. Obtain domain review.
-- [ ] **P8-02 — Build the pure rule engine.** Input completed sessions and current prescription; output a proposed adjustment, evidence window, reason, confidence, and policy version. Do not ask an LLM to invent numeric load changes.
-- [ ] **P8-03 — Test edge cases.** Cover inadequate data, unit conversion, changed exercises, missed sessions, conflicting effort reports, and upper/lower adjustment boundaries.
-- [ ] **P8-04 — Add user review.** Show what changed and why; allow acceptance or rejection. Accepted changes create a new verified plan version, preserving the original history.
-- [ ] **P8-05 — Run scenario evaluation.** Use synthetic improvement, plateau, inconsistent logging, and recovery scenarios. Document expected decisions and differences; do not claim real-user effectiveness without a suitable study.
+- [x] **P8-01 — Define a versioned progression policy.** Document required history, effort scale, missed-session treatment, plateau criteria, progression/deload bounds, and excluded populations/scenarios. Obtain domain review.
+- [x] **P8-02 — Build the pure rule engine.** Input completed sessions and current prescription; output a proposed adjustment, evidence window, reason, confidence, and policy version. Do not ask an LLM to invent numeric load changes.
+- [x] **P8-03 — Test edge cases.** Cover inadequate data, unit conversion, changed exercises, missed sessions, conflicting effort reports, and upper/lower adjustment boundaries.
+- [x] **P8-04 — Add user review.** Show what changed and why; allow acceptance or rejection. Accepted changes create a new verified plan version, preserving the original history.
+- [x] **P8-05 — Run scenario evaluation.** Use synthetic improvement, plateau, inconsistent logging, and recovery scenarios. Document expected decisions and differences; do not claim real-user effectiveness without a suitable study.
 
-**Exit gate:** every adjustment is reproducible, bounded, explained, user-reviewed, and attached to a versioned policy; insufficient data produces no forced adjustment.
+**Exit gate:** every adjustment is reproducible, bounded, explained, user-reviewed, and attached to a versioned policy; insufficient data produces no forced adjustment. (Satisfied 2026-10-09: 100% pure deterministic engine in `packages/domain/src/progression/` attached to policy `2026-10-01` in `docs/PROGRESSION_POLICY.md`; 11 edge case unit tests in `tests/progression.test.ts`; interactive user review UI with per-exercise acceptance and verified immutable plan creation with provenance `'progression'` in `apps/web/src/features/PlanView.tsx`; 10/10 labeled benchmark scenarios passing with 0 boundary violations and 100% determinism in `evals/progression-eval.ts` and `tests/progression-evaluation.test.ts`; documented in `docs/PHASE_8_REPORT.md`).
 
 ## 12. Phase 9 — Complete full-v1 features and harden operations
 

@@ -25,6 +25,11 @@ export interface PlansRepository {
   listPlanVersions?(kind: PlanKind): Promise<PlanVersionRecord[]>;
   pinPlanVersion?(kind: PlanKind, version: number): Promise<PlanWithVersion>;
   generatePlan?(input: PlanGenerationInput): Promise<PlanGenerationResult>;
+  getProgressionProposal?(planId?: string): Promise<import('./progression').ProgressionProposal>;
+  applyProgressionProposal?(
+    proposal: import('./progression').ProgressionProposal,
+    acceptedExerciseIds?: string[],
+  ): Promise<PlanWithVersion>;
 }
 
 export interface HistoryRepository {

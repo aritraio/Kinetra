@@ -13,11 +13,13 @@ import type {
   Profile,
   ProfileRecord,
   ProfileRepository,
+  ProgressionProposal,
   TrainingSessionRecord,
 } from '@kinetra/contracts';
 import { getFallbackMealPlan, getFallbackWorkoutPlan } from './fallback-templates';
 import { type MealVerificationProfile, verifyMealPlan } from './meal-verifier';
 import { SYNTHETIC_PERSONAS, type SyntheticPersona } from './personas';
+import { applyProgressionToWorkoutPlan, evaluateWorkoutProgression } from './progression';
 import { weightInKg } from './units';
 import { type WorkoutVerificationProfile, verifyWorkoutPlan } from './workout-verifier';
 
@@ -311,7 +313,84 @@ export class InMemoryDemoRepositories implements FeatureRepositories {
         verification,
       };
     },
+    getProgressionProposal: async (_planId?: string): Promise<ProgressionProposal> => {
+      const activeWorkout = this.currentPlans.get('workout');
+      if (!activeWorkout || activeWorkout.current_version.payload.kind !== 'workout') {
+        throw new Error('No active workout plan found for adaptive progression evaluation');
+      }
+      return evaluateWorkoutProgression({
+        plan: activeWorkout,
+        history: this.currentHistory,
+        options: {
+          preferredUnit: this.currentProfile.units === 'imperial' ? 'lb' : 'kg',
+        },
+      });
+    },
+    applyProgressionProposal: async (
+      proposal: ProgressionProposal,
+      acceptedExerciseIds?: string[],
+    ): Promise<PlanWithVersion> => {
+      const existingPlan = this.currentPlans.get('workout');
+      if (!existingPlan || existingPlan.current_version.payload.kind !== 'workout') {
+        throw new Error('No active workout plan found to apply progression adjustments');
+      }
+      const workoutPayload = existingPlan.current_version.payload;
+      const versions = this.planVersions.get('workout') ?? [];
+      const nextVersionNumber = (existingPlan.current_version.version ?? 0) + 1;
+      const planId = existingPlan.plan.id;
+
+      const { updatedPayload, verification } = applyProgressionToWorkoutPlan(
+        workoutPayload,
+        proposal,
+        {
+          acceptedExerciseIds: acceptedExerciseIds ? [...acceptedExerciseIds] : undefined,
+          verificationProfile: {
+            days_per_week: workoutPayload.days_per_week,
+            split_name: workoutPayload.split_name,
+          },
+        },
+      );
+
+      if (!verification.valid) {
+        throw new Error(
+          `Progressed plan failed domain verification: ${verification.hard_violations.map((v) => v.message).join('; ')}`,
+        );
+      }
+
+      const newVersionRecord: PlanVersionRecord = {
+        plan_id: planId,
+        owner_id: this.currentProfile.owner_id,
+        version: nextVersionNumber,
+        payload: updatedPayload,
+        schema_version: '2026-10-01',
+        policy_version: '2026-10-01',
+        prompt_version: 'v1.0-adaptive-progression',
+        provenance: 'progression',
+        created_at: new Date().toISOString(),
+      };
+
+      versions.push(newVersionRecord);
+      this.planVersions.set('workout', versions);
+
+      const updatedPlan: PlanWithVersion = {
+        plan: {
+          id: planId,
+          owner_id: this.currentProfile.owner_id,
+          kind: 'workout',
+          current_version: nextVersionNumber,
+          created_at: existingPlan.plan.created_at ?? new Date().toISOString(),
+        },
+        current_version: newVersionRecord,
+      };
+      this.currentPlans.set('workout', updatedPlan);
+
+      return JSON.parse(JSON.stringify(updatedPlan));
+    },
   };
+
+  addSession(session: TrainingSessionRecord): void {
+    this.currentHistory.unshift({ ...session });
+  }
 
   readonly history: HistoryRepository = {
     listSessions: async (limit = 50): Promise<TrainingSessionRecord[]> => {

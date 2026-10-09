@@ -112,6 +112,7 @@ export const planVersionProvenanceSchema = z.enum([
   'repaired',
   'template',
   'synthetic_fixture',
+  'progression',
 ]);
 export type PlanVersionProvenance = z.infer<typeof planVersionProvenanceSchema>;
 

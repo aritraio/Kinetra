@@ -7,14 +7,20 @@ import type {
   PlanGenerationInput,
   PlanGenerationResult,
   PlanKind,
+  PlanVersionRecord,
   PlanWithVersion,
   PlansRepository,
   Profile,
   ProfileRecord,
   ProfileRepository,
+  ProgressionProposal,
   TrainingSessionRecord,
 } from '@kinetra/contracts';
-import { weightInKg } from '@kinetra/domain';
+import {
+  applyProgressionToWorkoutPlan,
+  evaluateWorkoutProgression,
+  weightInKg,
+} from '@kinetra/domain';
 import type { KinetraDatabase } from './db';
 import { enqueueAtomicMutation } from './outbox';
 import { type RemoteSyncClient, SyncEngine } from './sync';
@@ -229,6 +235,74 @@ export class OfflineFirstRepositories implements FeatureRepositories {
         throw new Error('Plan generation unavailable offline');
       }
       return await this.plansRemote.generatePlan(input);
+    },
+
+    getProgressionProposal: async (): Promise<ProgressionProposal> => {
+      const activeWorkout = await this.plans.getPlan('workout');
+      if (activeWorkout?.current_version.payload.kind !== 'workout') {
+        throw new Error('No active workout plan found for progression evaluation');
+      }
+      const history = await this.history.listSessions(100);
+      const profile = await this.profile.getProfile();
+      return evaluateWorkoutProgression({
+        plan: activeWorkout,
+        history,
+        options: {
+          preferredUnit: profile?.units === 'imperial' ? 'lb' : 'kg',
+        },
+      });
+    },
+
+    applyProgressionProposal: async (
+      proposal: ProgressionProposal,
+      acceptedExerciseIds?: string[],
+    ): Promise<PlanWithVersion> => {
+      const activeWorkout = await this.plans.getPlan('workout');
+      if (activeWorkout?.current_version.payload.kind !== 'workout') {
+        throw new Error('No active workout plan found to apply progression adjustments');
+      }
+      const workoutPayload = activeWorkout.current_version.payload;
+      const { updatedPayload, verification } = applyProgressionToWorkoutPlan(
+        workoutPayload,
+        proposal,
+        {
+          acceptedExerciseIds: acceptedExerciseIds ? [...acceptedExerciseIds] : undefined,
+          verificationProfile: {
+            days_per_week: workoutPayload.days_per_week,
+            split_name: workoutPayload.split_name,
+          },
+        },
+      );
+      if (!verification.valid) {
+        throw new Error(
+          `Progressed plan failed domain verification: ${verification.hard_violations.map((v) => v.message).join('; ')}`,
+        );
+      }
+      const nextVersionNumber = activeWorkout.current_version.version + 1;
+      const newVersionRecord: PlanVersionRecord = {
+        plan_id: activeWorkout.plan.id,
+        owner_id: activeWorkout.plan.owner_id,
+        version: nextVersionNumber,
+        payload: updatedPayload,
+        schema_version: '2026-10-01',
+        policy_version: '2026-10-01',
+        prompt_version: 'v1.0-adaptive-progression',
+        provenance: 'progression',
+        created_at: new Date().toISOString(),
+      };
+      const updatedPlan: PlanWithVersion = {
+        plan: {
+          ...activeWorkout.plan,
+          current_version: nextVersionNumber,
+        },
+        current_version: newVersionRecord,
+      };
+      await this.db.plans.put({
+        kind: 'workout',
+        data: updatedPlan,
+        updated_at: new Date().toISOString(),
+      });
+      return updatedPlan;
     },
   };
 

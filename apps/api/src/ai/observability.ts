@@ -5,7 +5,8 @@ export type PlanGenerationOutcome =
   | 'repaired'
   | 'template'
   | 'failed'
-  | 'synthetic_fixture';
+  | 'synthetic_fixture'
+  | 'progression';
 
 export interface RedactedTelemetryEvent {
   readonly operation_id: string;
@@ -95,6 +96,7 @@ export class TelemetryCollector {
       template: 0,
       failed: 0,
       synthetic_fixture: 0,
+      progression: 0,
     };
     const latencies: number[] = [];
     let totalTokens = 0;
