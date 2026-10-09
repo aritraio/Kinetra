@@ -6,7 +6,14 @@ import { UserControlsModal } from './UserControlsModal';
 import { Button, ThemeToggle } from './ui';
 import { SyncStatusBadge } from './ui/SyncStatusBadge';
 
-export type NavigationTab = 'today' | 'measure' | 'plan' | 'progress' | 'onboarding' | 'foundation';
+export type NavigationTab =
+  | 'today'
+  | 'measure'
+  | 'plan'
+  | 'progress'
+  | 'posture'
+  | 'onboarding'
+  | 'foundation';
 
 export function DemoHeader({
   activeTab,
@@ -43,7 +50,7 @@ export function DemoHeader({
       <div className="header-top">
         <div className="branding">
           <span className="wordmark">KINETRA</span>
-          <span className="phase">PHASE 06 / OFFLINE COMPLETION & DATA CONTROLS</span>
+          <span className="phase">PHASE 07 / LOCAL POSTURE & FORM LAB</span>
         </div>
 
         {/* Sync Status Feedback & Controls */}
@@ -135,6 +142,13 @@ export function DemoHeader({
           onClick={() => onSelectTab('progress')}
         >
           Progress
+        </button>
+        <button
+          type="button"
+          className={`nav-tab ${activeTab === 'posture' ? 'active' : ''}`}
+          onClick={() => onSelectTab('posture')}
+        >
+          Posture & Form Lab
         </button>
         <button
           type="button"

@@ -9,6 +9,7 @@ import { webEnvironment } from './env';
 import { MeasureView } from './features/MeasureView';
 import { OnboardingView } from './features/OnboardingView';
 import { PlanView } from './features/PlanView';
+import { PostureLabView } from './features/PostureLabView';
 import { ProgressView } from './features/ProgressView';
 import { TodayView } from './features/TodayView';
 import { RepositoryProvider } from './repositories';
@@ -199,6 +200,7 @@ function KinetraApp() {
         {activeTab === 'measure' && <MeasureView />}
         {activeTab === 'plan' && <PlanView />}
         {activeTab === 'progress' && <ProgressView />}
+        {activeTab === 'posture' && <PostureLabView />}
         {activeTab === 'onboarding' && (
           <OnboardingView
             onComplete={() => setActiveTab('today')}

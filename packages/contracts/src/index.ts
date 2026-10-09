@@ -21,3 +21,4 @@ export * from './voice';
 export * from './repositories';
 export * from './export';
 export * from './photos';
+export * from './posture';

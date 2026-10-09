@@ -1,0 +1,201 @@
+import type { PoseLandmarksFrame } from '../../packages/contracts/src';
+import { generateSquatLandmarkSequence } from '../../packages/domain/src';
+
+export interface LabeledSquatFixture {
+  id: string;
+  name: string;
+  description: string;
+  category: 'normal' | 'edge_case' | 'failure_mode' | 'noise';
+  supported: boolean;
+  expectedValidReps: number;
+  expectedPartialReps: number;
+  expectedEccentricSec: number;
+  expectedPauseSec: number;
+  expectedConcentricSec: number;
+  expectedMinAngleDeg: number;
+  frames: PoseLandmarksFrame[];
+}
+
+export const POSTURE_FIXTURES: LabeledSquatFixture[] = [
+  {
+    id: 'normal_steady',
+    name: 'Normal Squats — Steady 2-0-1 Tempo',
+    description: 'Five standard deep squats with controlled descent and clear parallel depth.',
+    category: 'normal',
+    supported: true,
+    expectedValidReps: 5,
+    expectedPartialReps: 0,
+    expectedEccentricSec: 2.0,
+    expectedPauseSec: 0.4,
+    expectedConcentricSec: 1.0,
+    expectedMinAngleDeg: 85,
+    frames: generateSquatLandmarkSequence({
+      reps: 5,
+      depthKneeAngleDeg: 85,
+      eccentricSec: 2.0,
+      pauseSec: 0.4,
+      concentricSec: 1.0,
+      restBetweenRepsSec: 1.0,
+      fps: 30,
+    }),
+  },
+  {
+    id: 'normal_fast',
+    name: 'Normal Squats — Fast 1-0-1 Tempo',
+    description: 'Four explosive repetitions with brisk descent and immediate turnaround.',
+    category: 'normal',
+    supported: true,
+    expectedValidReps: 4,
+    expectedPartialReps: 0,
+    expectedEccentricSec: 1.0,
+    expectedPauseSec: 0.1,
+    expectedConcentricSec: 0.8,
+    expectedMinAngleDeg: 95,
+    frames: generateSquatLandmarkSequence({
+      reps: 4,
+      depthKneeAngleDeg: 95,
+      eccentricSec: 1.0,
+      pauseSec: 0.1,
+      concentricSec: 0.8,
+      restBetweenRepsSec: 0.8,
+      fps: 30,
+    }),
+  },
+  {
+    id: 'shallow_partial',
+    name: 'Shallow Squats — Partial Depth',
+    description:
+      'Three shallow squats reversing at 122° knee angle (failing parallel depth threshold).',
+    category: 'edge_case',
+    supported: true,
+    expectedValidReps: 0,
+    expectedPartialReps: 3,
+    expectedEccentricSec: 1.5,
+    expectedPauseSec: 0.2,
+    expectedConcentricSec: 1.0,
+    expectedMinAngleDeg: 122,
+    frames: generateSquatLandmarkSequence({
+      reps: 3,
+      depthKneeAngleDeg: 122,
+      eccentricSec: 1.5,
+      pauseSec: 0.2,
+      concentricSec: 1.0,
+      restBetweenRepsSec: 1.0,
+      fps: 30,
+    }),
+  },
+  {
+    id: 'pause_squats',
+    name: 'Pause Squats — Extended Isometric Bottom',
+    description: 'Three deep squats with a deliberate 2.5-second isometric hold in the hole.',
+    category: 'normal',
+    supported: true,
+    expectedValidReps: 3,
+    expectedPartialReps: 0,
+    expectedEccentricSec: 2.0,
+    expectedPauseSec: 2.5,
+    expectedConcentricSec: 1.2,
+    expectedMinAngleDeg: 82,
+    frames: generateSquatLandmarkSequence({
+      reps: 3,
+      depthKneeAngleDeg: 82,
+      eccentricSec: 2.0,
+      pauseSec: 2.5,
+      concentricSec: 1.2,
+      restBetweenRepsSec: 1.2,
+      fps: 30,
+    }),
+  },
+  {
+    id: 'noisy_jitter',
+    name: 'Gaussian Landmark Jitter',
+    description: 'Four deep squats with additive coordinate jitter simulating camera noise.',
+    category: 'noise',
+    supported: true,
+    expectedValidReps: 4,
+    expectedPartialReps: 0,
+    expectedEccentricSec: 2.0,
+    expectedPauseSec: 0.4,
+    expectedConcentricSec: 1.0,
+    expectedMinAngleDeg: 85,
+    frames: generateSquatLandmarkSequence({
+      reps: 4,
+      depthKneeAngleDeg: 85,
+      eccentricSec: 2.0,
+      pauseSec: 0.4,
+      concentricSec: 1.0,
+      noiseStdDev: 0.015,
+      fps: 30,
+    }),
+  },
+  {
+    id: 'intermittent_occlusion',
+    name: 'Intermittent Joint Occlusion',
+    description: 'Three squats with 300ms occlusion intervals where landmark visibility drops.',
+    category: 'edge_case',
+    supported: true,
+    expectedValidReps: 3,
+    expectedPartialReps: 0,
+    expectedEccentricSec: 2.0,
+    expectedPauseSec: 0.4,
+    expectedConcentricSec: 1.0,
+    expectedMinAngleDeg: 85,
+    frames: generateSquatLandmarkSequence({
+      reps: 3,
+      depthKneeAngleDeg: 85,
+      eccentricSec: 2.0,
+      pauseSec: 0.4,
+      concentricSec: 1.0,
+      occlusionIntervals: [
+        { startSec: 1.2, endSec: 1.5 },
+        { startSec: 5.6, endSec: 5.9 },
+      ],
+      fps: 30,
+    }),
+  },
+  {
+    id: 'variable_framerate',
+    name: 'Variable Frame Rate (10–25 fps)',
+    description:
+      'Four squats sampled with irregular frame intervals to test timestamp-derived tempo.',
+    category: 'edge_case',
+    supported: true,
+    expectedValidReps: 4,
+    expectedPartialReps: 0,
+    expectedEccentricSec: 2.0,
+    expectedPauseSec: 0.4,
+    expectedConcentricSec: 1.0,
+    expectedMinAngleDeg: 85,
+    frames: generateSquatLandmarkSequence({
+      reps: 4,
+      depthKneeAngleDeg: 85,
+      eccentricSec: 2.0,
+      pauseSec: 0.4,
+      concentricSec: 1.0,
+      variableFramerate: true,
+      fps: 20,
+    }),
+  },
+  {
+    id: 'camera_movement_drift',
+    name: 'Camera Coordinate Drift',
+    description: 'Three squats with gradual translation drift across screen coordinates.',
+    category: 'edge_case',
+    supported: true,
+    expectedValidReps: 3,
+    expectedPartialReps: 0,
+    expectedEccentricSec: 2.0,
+    expectedPauseSec: 0.4,
+    expectedConcentricSec: 1.0,
+    expectedMinAngleDeg: 85,
+    frames: generateSquatLandmarkSequence({
+      reps: 3,
+      depthKneeAngleDeg: 85,
+      eccentricSec: 2.0,
+      pauseSec: 0.4,
+      concentricSec: 1.0,
+      cameraDriftRatePerSec: { x: 0.015, y: -0.01 },
+      fps: 30,
+    }),
+  },
+];

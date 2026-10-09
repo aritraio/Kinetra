@@ -15,3 +15,4 @@ export * from './demo-repository';
 export * from './meal-verifier';
 export * from './workout-verifier';
 export * from './fallback-templates';
+export * from './posture';

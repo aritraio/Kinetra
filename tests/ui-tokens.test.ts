@@ -88,7 +88,7 @@ describe('Design tokens and assets verification (Steps 1 & 2)', () => {
     const headerPath = resolve(process.cwd(), 'apps/web/src/components/DemoHeader.tsx');
     const header = readFileSync(headerPath, 'utf-8');
 
-    expect(header).toMatch(/PHASE 0[56] \//);
+    expect(header).toMatch(/PHASE 0[567] \//);
     expect(header).not.toContain('PHASE 03 / DOMAIN CONTRACTS & DEMO');
   });
 });

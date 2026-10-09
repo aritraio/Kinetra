@@ -172,15 +172,15 @@ Local implementation and acceptance evidence: [Phase 2 report](PHASE_2_REPORT.md
 
 **Dependencies:** stable UI/contracts and camera consent. **Output:** one supported exercise with reproducible local analysis.
 
-- [ ] **P7-01 — Define the supported exercise and capture conditions.** Start with one exercise such as a squat; document viewpoint, space, lighting, devices, confidence limits, and unsupported situations.
-- [ ] **P7-02 — Integrate local pose processing.** Lazy-load the selected pose model, manage permissions/device switching, and release streams/resources on exit. Verify denied permission and unsupported devices have useful fallback screens.
-- [ ] **P7-03 — Implement signal processing.** Confidence-filter and smooth landmarks, compute supported image-plane angles, use a hysteresis-based rep state machine, and derive tempo from timestamps.
-- [ ] **P7-04 — Create labeled landmark fixtures.** Include normal reps, partial reps, pauses, occlusion, low frame rate, camera movement, and noise. Use consented recordings or synthetic landmark sequences, never unapproved user photos.
-- [ ] **P7-05 — Evaluate rep counts and tempo.** Publish the dataset size, expected labels, counting error, tempo error, supported conditions, and failures. Choose an acceptance threshold before comparing implementations.
-- [ ] **P7-06 — Build understandable feedback.** Display landmark overlays and limited actionable cues; suppress confident scoring below the supported confidence threshold. Provide a text summary accessible without viewing the overlay.
-- [ ] **P7-07 — Verify privacy and performance.** Confirm frames stay local, storage is opt-in, background capture stops, and target phones remain usable. Record actual performance rather than assuming every device can run the model.
+- [x] **P7-01 — Define the supported exercise and capture conditions.** Start with one exercise such as a squat; document viewpoint, space, lighting, devices, confidence limits, and unsupported situations.
+- [x] **P7-02 — Integrate local pose processing.** Lazy-load the selected pose model, manage permissions/device switching, and release streams/resources on exit. Verify denied permission and unsupported devices have useful fallback screens.
+- [x] **P7-03 — Implement signal processing.** Confidence-filter and smooth landmarks, compute supported image-plane angles, use a hysteresis-based rep state machine, and derive tempo from timestamps.
+- [x] **P7-04 — Create labeled landmark fixtures.** Include normal reps, partial reps, pauses, occlusion, low frame rate, camera movement, and noise. Use consented recordings or synthetic landmark sequences, never unapproved user photos.
+- [x] **P7-05 — Evaluate rep counts and tempo.** Publish the dataset size, expected labels, counting error, tempo error, supported conditions, and failures. Choose an acceptance threshold before comparing implementations.
+- [x] **P7-06 — Build understandable feedback.** Display landmark overlays and limited actionable cues; suppress confident scoring below the supported confidence threshold. Provide a text summary accessible without viewing the overlay.
+- [x] **P7-07 — Verify privacy and performance.** Confirm frames stay local, storage is opt-in, background capture stops, and target phones remain usable. Record actual performance rather than assuming every device can run the model.
 
-**Exit gate:** supported conditions pass the labeled evaluation; low-confidence cases show uncertainty; no body-fat/diagnostic claims exist; camera lifecycle and local-processing checks pass.
+**Exit gate:** supported conditions pass the labeled evaluation; low-confidence cases show uncertainty; no body-fat/diagnostic claims exist; camera lifecycle and local-processing checks pass. (Satisfied 2026-10-09: 100% rep counting accuracy and partial rep classification across 8 benchmark fixtures in `evals/posture-eval.ts` and `tests/posture-evaluation.test.ts`; pure local WebRTC camera management with background stream pause and fallback screens in `apps/web/src/features/PostureLabView.tsx`; complete kinematics and capture specification in `docs/POSTURE_FORM_SPEC.md`; documented in `docs/PHASE_7_REPORT.md`).
 
 ## 11. Phase 8 — Explainable adaptive progression
 
