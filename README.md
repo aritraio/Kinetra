@@ -9,18 +9,19 @@ Rather than treating Large Language Models as unverified authorities that halluc
 
 ---
 
-## Current Status: Phase 3 Implemented Locally
+## Current Status: Phase 4 Implemented Locally
 
-The repository is currently at **Phase 3 ("Domain contracts and an early synthetic demo")**.
+The repository is currently at **Phase 4 ("Verified AI pipeline and evaluations")**.
 
-- **Zero-Config Synthetic Demo**: Boots instantly in-memory without cloud accounts, database instances, or paid AI API keys.
-- **Pure Scientific Calculations**: 100% deterministic algorithms for BMR, TDEE, safe caloric bounds, macronutrient distributions, and body composition.
-- **Standardized Catalogs**: USDA FoodData Central ingredient provenance and exercise catalog with biomechanical metadata.
-- **Two Complete Personas**: **Maya Lin** (58 kg, cut, pescatarian) and **Marcus Vance** (88 kg, bulk, omnivore/powerbuilding) with 14 days of realistic logs, 7-day meal plans, and multi-week resistance programs.
-- **Interactive Web Interface**: 5 operational views (Today, Measure, Plan, Progress, and Foundation & Auth) with live persona switching and instant fixture resetting.
-- **Quality Gates Passing**: Strict TypeScript, Biome linter/formatter, workspace dependency boundaries, and 38 unit/contract tests passing in CI.
+- **Deterministic Domain Verifiers**: Pure TypeScript mathematical validators enforce hard nutritional constraints (calories $\pm 50\text{ kcal}$, protein $\pm 10\text{g}$, carbs $\pm 20\text{g}$, fat $\pm 10\text{g}$, thermodynamic $4P+4C+9F$ math, 100% allergen exclusion) and athletic biomechanics (equipment matching, set limits 1–6, compound rest $\ge 60\text{s}$, volume ceiling $\le 16$ sets/muscle group/day).
+- **Bounded Recovery Pipeline**: Initial model generation $\to$ max 1 semantic repair $\to$ verified deterministic template fallback. Hard constraint violations on accepted plans: **strictly 0**.
+- **Generation Idempotency & Conflict Safety**: SHA-256 payload hashing deduplicates in-flight calls and rejects key reuse with mismatched payloads with **HTTP 409 Conflict**.
+- **Privacy-Preserving Telemetry**: Hardened `assertRedacted()` telemetry records operational performance without ever storing raw prompt text, health notes, photos, or PII.
+- **50-Case Evaluation Corpus & Automated Runner**: 22 synthetic meal profiles, 22 workout profiles (regression and held-out cohorts), and 6 adversarial boundary cases evaluated via `pnpm evals`.
+- **Measured Benchmark Metrics**: **100.0%** final acceptance, **0** accepted hard violations, **100.0%** rubric pass rate (average **99.2/100**), **2 ms** P95 latency, and **$0.00021** estimated blended cost per generation.
+- **Quality Gates Passing**: Strict TypeScript, Biome linter/formatter, workspace dependency boundaries, 59 Vitest unit/contract tests, and zero-secret client bundle scans passing.
 
-*Note: Real-user collection and paid AI generation remain intentionally disabled at this phase. See the [Phase 3 Report](docs/PHASE_3_REPORT.md) and [Privacy Policy](PRIVACY.md).*
+*See the [Phase 4 Report](docs/PHASE_4_REPORT.md), [Evaluation Guide](docs/EVALUATION_GUIDE.md), and [Privacy Policy](PRIVACY.md).*
 
 ---
 
@@ -55,7 +56,7 @@ When you launch `http://127.0.0.1:5173`, you will see an instrument-grade dark U
 | **Persona Pills** (Header) | Click **Maya Lin (Cut)** or **Marcus Vance (Bulk)**, or click **Reset to pristine** | Instant state swap across all repositories; validates multi-persona fixtures and zero-bleed isolation. |
 | **Today** | Review today's workout prompt, calorie gauge, and macro progress bars. Fill out the "Quick daily log" form at the bottom. | Real-time intake vs. target calculations; optimistic updates persisting across in-memory session. |
 | **Measure** | Adjust demographic sliders, body weight, PAL activity level, and US Navy tape measurements. | Live Mifflin-St Jeor BMR, TDEE, macronutrient grams, and body-fat calculations with peer-reviewed literature citations. |
-| **Plan** | Toggle between **Nutrition** (7-day pescatarian or omnivore schedules) and **Training** (4-day Upper/Lower or 5-day PPL programs). | Canonical plan schema rendering, meal timings, target macros, and structured progression sets/reps. |
+| **Plan** | Toggle between **Nutrition** (7-day schedules) and **Training** (multi-day splits). | Canonical plan schema rendering, meal timings, target macros, and structured progression sets/reps with provenance badges. |
 | **Progress** | Inspect the 14-day weight trend bar chart, compliance KPI cards, raw daily log records, and completed workout sessions. | 14 days of realistic progression telemetry without gaps or synthetic anomalies. |
 | **Foundation & Auth** | Test the typed tRPC health endpoint, Server-Sent Events (SSE) streaming cancellation, and optional local Supabase Auth panel. | The underlying Phase 1 & 2 transport layer and security infrastructure. |
 
@@ -69,22 +70,25 @@ The repository is organized as a strict, clean pnpm monorepo:
 kinetra/
 ├── apps/
 │   ├── web/               # React 19 + Vite frontend (Tailwind/CSS tokens, TanStack Router/Query, Tab views)
-│   └── api/               # Hono backend with typed tRPC routers, SSE streaming, and secure headers
+│   └── api/               # Hono backend with tRPC routers, SSE streaming, AI pipeline, and idempotency store
 ├── packages/
 │   ├── contracts/         # Canonical Zod schemas (Profile, Plans, Logs, Sessions, Coach streams, Repositories)
-│   ├── domain/            # Pure sports science calculations, USDA/exercise catalogs, personas, demo repos
+│   ├── domain/            # Pure sports science calculations, deterministic meal/workout verifiers, fallback templates
 │   ├── db/                # Drizzle ORM schema models, migrations, and tenant isolation types
 │   └── config/            # Shared ESLint/Biome, TS configs, and environment validation
+├── evals/                 # Synthetic benchmark corpus (44 profiles + 6 adversarial cases), rubrics, and runner
 ├── docs/                  # Comprehensive engineering docs and audit trail
 │   ├── ARCHITECTURE.md    # System architecture, data flow, security model, and decision records
+│   ├── EVALUATION_GUIDE.md# Rubrics, scoring methodology, release gates, and cost economics
 │   ├── PROJECT_PLAN.md    # Multi-phase master completion plan and progress tracking
 │   ├── WORKFLOW.md        # Engineering guidelines, testing protocols, and CI/CD rules
 │   ├── PHASE_1_REPORT.md  # Phase 1 verification evidence
 │   ├── PHASE_2_REPORT.md  # Phase 2 auth & tenant isolation verification evidence
-│   └── PHASE_3_REPORT.md  # Phase 3 domain contracts & synthetic demo verification evidence
+│   ├── PHASE_3_REPORT.md  # Phase 3 domain contracts & synthetic demo verification evidence
+│   └── PHASE_4_REPORT.md  # Phase 4 verified AI pipeline & evaluation benchmark report
 ├── scripts/               # Boundary checking, security integration testing, auth seeding, and sanity checks
 ├── supabase/              # Local Supabase migrations, RLS policies, quota functions, and SQL seeds
-├── tests/                 # Vitest test suites (domain.test.ts, foundation.test.ts, security.test.ts)
+├── tests/                 # Vitest test suites (ai-pipeline.test.ts, domain.test.ts, foundation.test.ts, security.test.ts)
 └── PRIVACY.md             # Privacy policy, data handling guarantees, and launch gates
 ```
 
@@ -98,8 +102,8 @@ Kinetra is built according to a strict 6-phase engineering lifecycle:
 flowchart LR
     P1["Phase 1: Foundation\n(Completed)"] --> P2["Phase 2: Auth & Tenancy\n(Completed)"]
     P2 --> P3["Phase 3: Domain & Demo\n(Completed)"]
-    P3 --> P4["Phase 4: Verified AI Pipeline\n(Next)"]
-    P4 --> P5["Phase 5: Core Instrument UI\n(Upcoming)"]
+    P3 --> P4["Phase 4: Verified AI Pipeline\n(Completed)"]
+    P4 --> P5["Phase 5: Core Instrument UI\n(Next)"]
     P5 --> P6["Phase 6: Offline & Launch\n(Upcoming)"]
 ```
 
@@ -120,13 +124,15 @@ flowchart LR
 - Two complete synthetic personas with 14 days of realistic logs and structured plans.
 - 5-destination web demo with zero cloud credentials required.
 
-### ⏳ Phase 4: Deterministic Verification & AI Pipeline (Next Up)
-- **Server-Side AI Pipeline**: Google Gemini integration isolated exclusively to backend procedures.
-- **Deterministic Verification Engine**: Algorithms that inspect AI-generated meal and workout plans against hard nutritional constraints (calorie bounds, macro tolerances, dietary restrictions, equipment availability) before accepting them.
-- **Bounded Retry Loop**: Automatic regeneration with structured error feedback if generated plans fail verification.
-- **Real-Time Coach Streaming**: SSE endpoint delivering streaming coaching advice with citations and structured follow-up suggestions.
+### ✅ Phase 4: Deterministic Verification & AI Pipeline (Complete)
+- **Primary Provider Adapter**: Pinned `gemini-2.5-flash` model, temperature `0.2`, seed `42`, structured Zod schema parsing.
+- **Deterministic Verifiers**: Pure TypeScript mathematical engines enforcing calorie tolerances ($\pm 50\text{ kcal}$), macro tolerances, $4P+4C+9F$ math, allergen exclusions, equipment matching, rest periods ($\ge 60\text{s}$ compound), and volume ceilings ($\le 16$ sets/muscle group/day).
+- **Bounded Recovery**: Initial attempt $\to$ max 1 semantic repair $\to$ deterministic fallback template with 0 hard violations on accepted plans.
+- **Generation Idempotency**: SHA-256 payload hashing with HTTP 409 conflict detection for key reuse with mismatched payloads.
+- **Redacted Observability**: Complete privacy isolation preventing storage of prompt text, notes, or health PII.
+- **Automated Evaluations Harness**: 50 synthetic/adversarial profiles evaluated via `pnpm evals` with 100% acceptance, 0 hard violations, 100% rubric pass rate, P95 latency 2ms, and $0.00021/generation cost.
 
-### ⏳ Phase 5: Core Instrument UI & Form Lab (Upcoming)
+### ⏳ Phase 5: Core Instrument UI & Form Lab (Next Up)
 - **Production Instrument Interface**: High-density mobile-first ergonomics, micro-interactions, dark/light theme tokens.
 - **Active Workout Session Logger**: Rest timers, RPE/RIR tracking, and superset support.
 - **On-Device Form Lab**: Real-time rep counting and joint-angle analysis using client-side MediaPipe/TensorFlow. **No camera video or photos are ever sent to a remote server.**
@@ -143,11 +149,14 @@ flowchart LR
 Every change to the repository must pass our non-mutating quality check:
 
 ```sh
-# Run full static analysis, boundary check, typecheck, 38 tests, and build checks
+# Run full static analysis, boundary check, typecheck, 59 tests, and build checks
 pnpm check
 
-# Run unit and contract tests in watch mode
+# Run unit, contract, and AI pipeline tests in Vitest
 pnpm test
+
+# Run the 50-case AI pipeline evaluation benchmark harness
+pnpm evals
 
 # Run API smoke tests (requires API running on port 3001)
 pnpm smoke
@@ -174,10 +183,11 @@ pnpm db:stop
 ## Key Documentation
 
 - [design/README.md](design/README.md) - Complete monochrome web and future Android design atlas: 54 screens in light and dark themes, with editable mockups, PNGs, diagrams, and implementation guidance.
-
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - System topology, data models, state machine, and design patterns.
 - [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md) - Step-by-step deliverable checklist for all 6 phases.
-- [docs/PHASE_3_REPORT.md](docs/PHASE_3_REPORT.md) - Full evidence and verification report for the current Phase 3 build.
+- [docs/EVALUATION_GUIDE.md](docs/EVALUATION_GUIDE.md) - Benchmark rubric dimensions, release gate thresholds, and LLM cost models.
+- [docs/PHASE_4_REPORT.md](docs/PHASE_4_REPORT.md) - Full evidence and verification report for the Phase 4 verified AI pipeline.
+- [docs/PHASE_3_REPORT.md](docs/PHASE_3_REPORT.md) - Evidence and verification report for the Phase 3 domain build.
 - [docs/WORKFLOW.md](docs/WORKFLOW.md) - Git conventions, testing requirements, and coding standards.
 - [PRIVACY.md](PRIVACY.md) - Data minimization guarantees and privacy policy.
 

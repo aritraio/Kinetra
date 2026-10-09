@@ -14,6 +14,8 @@ const environmentSchema = z.object({
   AI_GLOBAL_TOKEN_LIMIT: z.coerce.number().int().min(1).max(10000000).default(1000000),
   AI_MAX_CONCURRENT: z.coerce.number().int().min(1).max(20).default(1),
   AI_RESERVED_TOKENS: z.coerce.number().int().min(1).max(100000).default(1000),
+  GEMINI_API_KEY: z.string().min(1).optional(),
+  ENABLE_PHOTOS: z.enum(['true', 'false']).default('false'),
 });
 export type ApiEnvironment = z.infer<typeof environmentSchema>;
 

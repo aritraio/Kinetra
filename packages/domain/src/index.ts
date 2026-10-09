@@ -12,3 +12,6 @@ export * from './calculations';
 export * from './catalog';
 export * from './personas';
 export * from './demo-repository';
+export * from './meal-verifier';
+export * from './workout-verifier';
+export * from './fallback-templates';

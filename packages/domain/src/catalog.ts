@@ -626,12 +626,83 @@ export const EXERCISE_CATALOG: readonly NormalizedExercise[] = [
       'Drive through front heel to step through to next rep smoothly.',
     ],
   },
+  {
+    id: 'pushup_standard',
+    name: 'Standard Push-Up',
+    aliases: ['pushup', 'push-up', 'bodyweight pushup', 'standard push-up'],
+    primary_muscle: 'chest',
+    secondary_muscles: ['triceps', 'shoulders', 'core'],
+    movement_pattern: 'horizontal_push',
+    equipment: ['bodyweight'],
+    is_compound: true,
+    form_cues: [
+      'Maintain rigid plank line from head to heels.',
+      'Lower chest until elbows reach 90 degrees, press up firmly.',
+    ],
+  },
+  {
+    id: 'bodyweight_squat',
+    name: 'Bodyweight Air Squats',
+    aliases: ['air squat', 'bodyweight squat', 'air squats', 'bodyweight air squats'],
+    primary_muscle: 'quadriceps',
+    secondary_muscles: ['glutes', 'hamstrings'],
+    movement_pattern: 'squat',
+    equipment: ['bodyweight'],
+    is_compound: true,
+    form_cues: [
+      'Descend until hips are parallel with knees.',
+      'Drive through midfoot, maintaining upright torso.',
+    ],
+  },
+  {
+    id: 'glute_bridge_bodyweight',
+    name: 'Single-Leg Glute Bridge',
+    aliases: ['glute bridge', 'bodyweight glute bridge', 'single leg glute bridge'],
+    primary_muscle: 'glutes',
+    secondary_muscles: ['hamstrings', 'core'],
+    movement_pattern: 'hip_hinge',
+    equipment: ['bodyweight'],
+    is_compound: true,
+    form_cues: [
+      'Drive through heels to extend hips toward ceiling.',
+      'Squeeze glute at peak extension for full second.',
+    ],
+  },
+  {
+    id: 'inverted_row_bodyweight',
+    name: 'Inverted Row / Pull-Up',
+    aliases: ['inverted row', 'bodyweight row', 'horizontal row bodyweight'],
+    primary_muscle: 'back',
+    secondary_muscles: ['biceps', 'shoulders'],
+    movement_pattern: 'horizontal_pull',
+    equipment: ['bodyweight'],
+    is_compound: true,
+    form_cues: [
+      'Keep body straight and pull chest to handles/bar.',
+      'Retract shoulder blades fully at top.',
+    ],
+  },
+  {
+    id: 'pike_pushup_bodyweight',
+    name: 'Pike Push-Up',
+    aliases: ['pike pushup', 'pike push-up', 'bodyweight pike pushup'],
+    primary_muscle: 'shoulders',
+    secondary_muscles: ['triceps', 'core'],
+    movement_pattern: 'vertical_push',
+    equipment: ['bodyweight'],
+    is_compound: true,
+    form_cues: [
+      'Form inverted V with hips elevated, lower crown of head between hands.',
+      'Press through shoulders back to starting position.',
+    ],
+  },
 ];
 
 export function findExercise(query: string): NormalizedExercise | null {
   const normalized = query.trim().toLowerCase();
   if (!normalized) return null;
 
+  // 1. Exact match on id, name, or alias
   for (const item of EXERCISE_CATALOG) {
     if (item.id === normalized || item.name.toLowerCase() === normalized) {
       return item;
@@ -641,7 +712,12 @@ export function findExercise(query: string): NormalizedExercise | null {
     }
   }
 
+  // 2. Substring matching (with equipment protection)
+  const isQueryBodyweight = normalized.includes('bodyweight') || normalized.includes('air ');
   for (const item of EXERCISE_CATALOG) {
+    if (isQueryBodyweight && item.equipment.some((eq) => eq === 'barbell' || eq === 'dumbbells')) {
+      continue; // Never match barbell/dumbbell exercise when query explicitly specifies bodyweight
+    }
     const itemName = item.name.toLowerCase();
     if (itemName.includes(normalized) || normalized.includes(item.id)) return item;
     for (const alias of item.aliases) {
@@ -682,5 +758,31 @@ export function checkExerciseEquipment(
 ): boolean {
   if (exercise.equipment.length === 0 || exercise.equipment.includes('bodyweight')) return true;
   const set = new Set(availableEquipment.map((e) => e.trim().toLowerCase()));
-  return exercise.equipment.every((eq) => set.has(eq.toLowerCase()));
+
+  const hasEquipment = (required: string): boolean => {
+    const req = required.toLowerCase();
+    if (set.has(req)) return true;
+    if (req === 'bench') {
+      return (
+        set.has('flat_bench') ||
+        set.has('incline_bench') ||
+        set.has('adjustable_bench') ||
+        set.has('bench')
+      );
+    }
+    if (req === 'dumbbells') return set.has('dumbbell') || set.has('dumbbells');
+    if (req === 'barbell') return set.has('barbells') || set.has('barbell');
+    if (req === 'squat_rack') {
+      return set.has('rack') || set.has('power_rack') || set.has('squat_rack');
+    }
+    if (req === 'pull_up_bar') {
+      return set.has('pullup_bar') || set.has('pull_up_bar') || set.has('pull up bar');
+    }
+    if (req === 'cable_machine') {
+      return set.has('cables') || set.has('cable') || set.has('cable_machine');
+    }
+    return false;
+  };
+
+  return exercise.equipment.every((eq) => hasEquipment(eq));
 }

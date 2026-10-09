@@ -9,6 +9,12 @@ import { secureHeaders } from 'hono/secure-headers';
 import { streamSSE } from 'hono/streaming';
 import type { ApiEnvironment } from './env';
 import { appRouter } from './router';
+import {
+  GeminiProviderAdapter,
+  GenerationError,
+  IdempotencyConflictError,
+  PlanGenerationOrchestrator,
+} from './ai';
 
 export function createApp(env: ApiEnvironment, http: typeof fetch = fetch) {
   const app = new Hono();
@@ -91,22 +97,47 @@ export function createApp(env: ApiEnvironment, http: typeof fetch = fetch) {
       if (!stream.aborted) await send({ type: 'done' });
     });
   });
-  const protectedDisabled = async (c: import('hono').Context) => {
-    if (c.req.method !== 'POST')
-      return c.json({ code: 'METHOD_NOT_ALLOWED' }, 405, { Allow: 'POST' });
-    await verifyIdentity(c.req.header('Authorization'), env, http);
+  app.post('/api/plans/generate', async (c) => {
+    const identity = await verifyIdentity(c.req.header('Authorization'), env, http);
+    requireLocalWrites(env);
     let input: unknown;
     try {
       input = await c.req.json();
     } catch {
-      return c.json({ code: 'BAD_REQUEST' }, 400);
+      return c.json({ code: 'BAD_REQUEST', message: 'Malformed JSON payload' }, 400);
     }
-    if (!generationRequestSchema.safeParse(input).success)
-      return c.json({ code: 'BAD_REQUEST' }, 400);
-    return c.json({ code: 'NOT_IMPLEMENTED', message: 'AI generation is not enabled' }, 501);
-  };
-  app.all('/api/plans/generate', protectedDisabled);
-  app.all('/api/stream/coach', protectedDisabled);
+    const parsed = generationRequestSchema.safeParse(input);
+    if (!parsed.success) {
+      return c.json({ code: 'BAD_REQUEST', message: 'Invalid generation parameters' }, 400);
+    }
+    await reserveBudget(env, identity, http);
+    const orchestrator = new PlanGenerationOrchestrator({
+      adapter: new GeminiProviderAdapter(
+        env.GEMINI_API_KEY ? { apiKey: env.GEMINI_API_KEY } : undefined,
+      ),
+    });
+    try {
+      const result = await orchestrator.generatePlan(identity.id, parsed.data);
+      return c.json(result, 200);
+    } catch (error) {
+      if (error instanceof IdempotencyConflictError) {
+        return c.json({ code: 'CONFLICT', message: error.message }, 409);
+      }
+      if (error instanceof GenerationError) {
+        return c.json({ code: error.code, message: error.message }, 422);
+      }
+      throw error;
+    }
+  });
+  app.all('/api/plans/generate', (c) =>
+    c.json({ code: 'METHOD_NOT_ALLOWED' }, 405, { Allow: 'POST' }),
+  );
+  app.all('/api/stream/coach', async (c) => {
+    if (c.req.method !== 'POST')
+      return c.json({ code: 'METHOD_NOT_ALLOWED' }, 405, { Allow: 'POST' });
+    await verifyIdentity(c.req.header('Authorization'), env, http);
+    return c.json({ code: 'NOT_IMPLEMENTED', message: 'Coach stream is not yet enabled' }, 501);
+  });
   app.all('/api/plans/*', (c) => c.json({ code: 'NOT_FOUND' }, 404));
   app.post('/api/security/quota-probe', async (c) => {
     requireLocalWrites(env);

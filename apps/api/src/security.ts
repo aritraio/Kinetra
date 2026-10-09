@@ -62,13 +62,24 @@ export async function databaseRequest(
   path: string,
   body?: unknown,
   http: typeof fetch = fetch,
+  method?: 'GET' | 'POST' | 'DELETE' | 'PATCH',
+  useServiceRole?: boolean,
 ): Promise<unknown> {
   try {
+    const bearer =
+      useServiceRole && env.SUPABASE_SERVICE_ROLE_KEY
+        ? env.SUPABASE_SERVICE_ROLE_KEY
+        : identity.token;
+    const apikey =
+      useServiceRole && env.SUPABASE_SERVICE_ROLE_KEY
+        ? env.SUPABASE_SERVICE_ROLE_KEY
+        : (env.SUPABASE_PUBLISHABLE_KEY ?? '');
+    const httpMethod = method ?? (body === undefined ? 'GET' : 'POST');
     const response = await http(`${env.SUPABASE_URL}/rest/v1/${path}`, {
-      method: body === undefined ? 'GET' : 'POST',
+      method: httpMethod,
       headers: {
-        apikey: env.SUPABASE_PUBLISHABLE_KEY ?? '',
-        Authorization: `Bearer ${identity.token}`,
+        apikey,
+        Authorization: `Bearer ${bearer}`,
         'Content-Type': 'application/json',
       },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),

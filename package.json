@@ -15,6 +15,7 @@
     "format": "biome format --write .",
     "typecheck": "pnpm -r typecheck && tsc -p tsconfig.json",
     "test": "vitest run",
+    "evals": "node --import tsx evals/runner.ts",
     "build": "pnpm -r build && node --import tsx scripts/scan-web.ts",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "db:start": "supabase start",
@@ -31,13 +32,14 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
-    "@types/node": "24.19.0",
-    "typescript": "5.9.3",
-    "tsx": "4.23.15",
-    "vitest": "5.0.3",
-    "esbuild": "0.28.2",
-    "supabase": "2.119.0",
     "@trpc/client": "11.19.0",
+    "@types/node": "24.19.0",
+    "esbuild": "0.28.2",
+    "fake-indexeddb": "^6.2.5",
+    "supabase": "2.119.0",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vitest": "5.0.3",
     "zod": "4.6.5"
   }
 }

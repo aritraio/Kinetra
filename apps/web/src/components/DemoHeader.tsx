@@ -1,8 +1,12 @@
 import { useState } from 'react';
+import { RemindersModal } from '../features/RemindersModal';
 import { useRepositoryControls } from '../repositories';
-import { ThemeToggle } from './ui';
+import { ConflictResolutionModal } from './ConflictResolutionModal';
+import { UserControlsModal } from './UserControlsModal';
+import { Button, ThemeToggle } from './ui';
+import { SyncStatusBadge } from './ui/SyncStatusBadge';
 
-export type NavigationTab = 'today' | 'measure' | 'plan' | 'progress' | 'foundation';
+export type NavigationTab = 'today' | 'measure' | 'plan' | 'progress' | 'onboarding' | 'foundation';
 
 export function DemoHeader({
   activeTab,
@@ -11,8 +15,21 @@ export function DemoHeader({
   activeTab: NavigationTab;
   onSelectTab: (tab: NavigationTab) => void;
 }) {
-  const { activePersonaId, setPersona, resetDemo } = useRepositoryControls();
+  const {
+    activePersonaId,
+    setPersona,
+    resetDemo,
+    syncStatus,
+    triggerSync,
+    conflicts,
+    resolveConflict,
+    exportData,
+    deleteAccount,
+  } = useRepositoryControls();
   const [resetStatus, setResetStatus] = useState<string | null>(null);
+  const [isRemindersOpen, setIsRemindersOpen] = useState(false);
+  const [isUserControlsOpen, setIsUserControlsOpen] = useState(false);
+  const [isConflictsOpen, setIsConflictsOpen] = useState(false);
 
   const handleReset = async () => {
     setResetStatus('Resetting...');
@@ -26,7 +43,16 @@ export function DemoHeader({
       <div className="header-top">
         <div className="branding">
           <span className="wordmark">KINETRA</span>
-          <span className="phase">PHASE 03 / DOMAIN CONTRACTS & DEMO</span>
+          <span className="phase">PHASE 06 / OFFLINE COMPLETION & DATA CONTROLS</span>
+        </div>
+
+        {/* Sync Status Feedback & Controls */}
+        <div className="header-sync-area">
+          <SyncStatusBadge
+            status={syncStatus}
+            onSyncNow={() => void triggerSync()}
+            onOpenConflicts={() => setIsConflictsOpen(true)}
+          />
         </div>
 
         {/* Demo Mode / Persona Selector Bar */}
@@ -48,6 +74,24 @@ export function DemoHeader({
               Marcus Vance (Bulk)
             </button>
           </div>
+
+          <Button
+            size="small"
+            variant="quiet"
+            onClick={() => setIsRemindersOpen(true)}
+            title="Configure in-app schedule reminders"
+          >
+            Reminders
+          </Button>
+
+          <Button
+            size="small"
+            variant="quiet"
+            onClick={() => setIsUserControlsOpen(true)}
+            title="Export personal data or request deletion"
+          >
+            Data & Privacy
+          </Button>
 
           <button
             type="button"
@@ -94,12 +138,40 @@ export function DemoHeader({
         </button>
         <button
           type="button"
+          className={`nav-tab ${activeTab === 'onboarding' ? 'active' : ''}`}
+          onClick={() => onSelectTab('onboarding')}
+        >
+          Onboarding
+        </button>
+        <button
+          type="button"
           className={`nav-tab ${activeTab === 'foundation' ? 'active' : ''}`}
           onClick={() => onSelectTab('foundation')}
         >
           Foundation & Auth
         </button>
       </nav>
+
+      <RemindersModal isOpen={isRemindersOpen} onClose={() => setIsRemindersOpen(false)} />
+
+      <ConflictResolutionModal
+        isOpen={isConflictsOpen}
+        onClose={() => setIsConflictsOpen(false)}
+        conflicts={conflicts}
+        onResolve={resolveConflict}
+      />
+
+      <UserControlsModal
+        isOpen={isUserControlsOpen}
+        onClose={() => setIsUserControlsOpen(false)}
+        ownerId={`user-${activePersonaId}`}
+        onExport={exportData}
+        onDeleteAccount={deleteAccount}
+        onAccountDeleted={() => {
+          setResetStatus('Account deleted & local data erased');
+          setTimeout(() => setResetStatus(null), 3000);
+        }}
+      />
     </header>
   );
 }

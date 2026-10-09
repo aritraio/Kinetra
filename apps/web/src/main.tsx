@@ -7,6 +7,7 @@ import { rpc } from './client';
 import { DemoHeader, type NavigationTab } from './components/DemoHeader';
 import { webEnvironment } from './env';
 import { MeasureView } from './features/MeasureView';
+import { OnboardingView } from './features/OnboardingView';
 import { PlanView } from './features/PlanView';
 import { ProgressView } from './features/ProgressView';
 import { TodayView } from './features/TodayView';
@@ -117,21 +118,98 @@ function KinetraApp() {
   const initialPersona = query.get('demo') === 'marcus' ? 'marcus' : 'maya';
 
   const [activeTab, setActiveTab] = useState<NavigationTab>(initialTab);
+  const [swWaiting, setSwWaiting] = useState<ServiceWorker | null>(null);
+
+  // Register service worker and listen for updates
+  useEffect(() => {
+    if ('serviceWorker' in navigator && process.env.NODE_ENV !== 'test') {
+      navigator.serviceWorker
+        .register('/sw.js')
+        .then((registration) => {
+          if (registration.waiting) {
+            setSwWaiting(registration.waiting);
+          }
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            if (newWorker) {
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  setSwWaiting(newWorker);
+                }
+              });
+            }
+          });
+        })
+        .catch(() => {
+          // Service worker unavailable or blocked
+        });
+
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+          refreshing = true;
+          window.location.reload();
+        }
+      });
+    }
+  }, []);
+
+  const handleUpdateApp = () => {
+    if (swWaiting) {
+      swWaiting.postMessage({ type: 'SKIP_WAITING' });
+    }
+  };
 
   return (
     <RepositoryProvider initialPersona={initialPersona}>
       <main>
+        {swWaiting && (
+          <div
+            className="sw-update-banner"
+            role="alert"
+            style={{
+              background: 'var(--surface-secondary, #1e2230)',
+              borderBottom: '1px solid var(--border)',
+              padding: '10px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: 'var(--text-xs)',
+              gap: '12px',
+            }}
+          >
+            <span>
+              <strong>Update available:</strong> A new version of Kinetra is ready. Your pending
+              outbox logs will be preserved.
+            </span>
+            <button
+              type="button"
+              className="sync-action-btn"
+              style={{ fontWeight: 600, padding: '4px 12px' }}
+              onClick={handleUpdateApp}
+            >
+              Update Now
+            </button>
+          </div>
+        )}
+
         <DemoHeader activeTab={activeTab} onSelectTab={setActiveTab} />
 
         {activeTab === 'today' && <TodayView onNavigateToPlan={() => setActiveTab('plan')} />}
         {activeTab === 'measure' && <MeasureView />}
         {activeTab === 'plan' && <PlanView />}
         {activeTab === 'progress' && <ProgressView />}
+        {activeTab === 'onboarding' && (
+          <OnboardingView
+            onComplete={() => setActiveTab('today')}
+            onCancel={() => setActiveTab('today')}
+          />
+        )}
         {activeTab === 'foundation' && <FoundationPanel />}
 
         <footer>
-          Verified identity · Local synthetic development · AI and photo collection disabled ·
-          Domain contracts active
+          Verified identity · English baseline (en-US / en-GB supported) · Local synthetic
+          development · AI and photo collection disabled · Domain contracts active
         </footer>
       </main>
     </RepositoryProvider>

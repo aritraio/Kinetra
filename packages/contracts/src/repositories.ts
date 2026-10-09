@@ -1,5 +1,11 @@
 import type { LogRecord, LogUpdate, Profile, ProfileRecord } from './account';
-import type { PlanKind, PlanWithVersion } from './plans';
+import type {
+  PlanGenerationInput,
+  PlanGenerationResult,
+  PlanKind,
+  PlanVersionRecord,
+  PlanWithVersion,
+} from './plans';
 import type { TrainingSessionRecord } from './sessions';
 
 export interface ProfileRepository {
@@ -10,11 +16,15 @@ export interface ProfileRepository {
 export interface LogsRepository {
   listLogs(limit?: number): Promise<LogRecord[]>;
   saveLog(expectedRevision: number, log: LogUpdate): Promise<LogRecord>;
+  deleteLog(localDate: string): Promise<void>;
 }
 
 export interface PlansRepository {
   getPlan(kind: PlanKind): Promise<PlanWithVersion | null>;
   listPlans(): Promise<PlanWithVersion[]>;
+  listPlanVersions?(kind: PlanKind): Promise<PlanVersionRecord[]>;
+  pinPlanVersion?(kind: PlanKind, version: number): Promise<PlanWithVersion>;
+  generatePlan?(input: PlanGenerationInput): Promise<PlanGenerationResult>;
 }
 
 export interface HistoryRepository {

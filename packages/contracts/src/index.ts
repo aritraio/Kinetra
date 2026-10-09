@@ -19,3 +19,5 @@ export * from './sessions';
 export * from './coach';
 export * from './voice';
 export * from './repositories';
+export * from './export';
+export * from './photos';

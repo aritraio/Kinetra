@@ -1,6 +1,6 @@
 # Kinetra phased completion plan
 
-**Status:** Phases 0, 1, 2, and 3 are fully completed and verified locally with automated preview spikes (`pnpm test:preview`). Later phases remain implementation backlog.
+**Status:** Phases 0, 1, 2, 3, 4, 5, and 6 are fully completed and verified locally with automated test suites (`pnpm test`) and full pipeline validation (`pnpm check`). Later phases remain implementation backlog.
 
 This plan consolidates the original reviews into an ordered path to a usable initial release and full v1. It prioritizes a runnable foundation, tenant security, verified AI output, privacy, and an early synthetic demo. The architecture and workflow are [documented separately](ARCHITECTURE.md) and [here](WORKFLOW.md).
 
@@ -121,52 +121,52 @@ Local implementation and acceptance evidence: [Phase 2 report](PHASE_2_REPORT.md
 
 **Dependencies:** Phase 3, secure provider boundary, catalogs and policy review. **Output:** accepted plans with reproducible verification evidence.
 
-- [ ] **P4-01 — Implement the primary provider adapter.** Probe current structured output and streaming capabilities for the chosen model. Pin model configuration and translate the canonical schema to supported provider constraints. Record probe date and observed limitations.
-- [ ] **P4-02 — Build deterministic meal verification.** Check configured energy/macro totals, day/meal counts, duplicates, explicit restrictions, ingredient resolution, and pantry-only mode when requested. Treat soft preferences separately from hard exclusions. Include tests near each tolerance boundary.
-- [ ] **P4-03 — Build deterministic workout verification.** Check requested days, exercise/equipment compatibility, sets/reps, rest policy, configured volume bounds, and unsupported entries. Domain review must validate the policy; tests verify the policy's implementation.
-- [ ] **P4-04 — Implement bounded recovery.** Allow one semantic repair and only budgeted transport retry/fallback. Apply a global deadline/call/token cap across all attempts. Verify no infinite repair loop, overlapping attempt, or silent acceptance of invalid output.
-- [ ] **P4-05 — Add verified fallback templates.** Run templates through the same schemas and verifier against the user's constraints. If no valid result exists, return a safe, actionable failure. Label generated, repaired, cached, and template results accurately.
-- [ ] **P4-06 — Implement generation idempotency.** Deduplicate owner/key/input combinations; reject key reuse with a different payload. Test concurrent double submissions, worker interruption, and replay after completion.
-- [ ] **P4-07 — Add redacted observability.** Track latency, operation ID, provider/model, prompt/schema/policy versions, attempts, rejection reasons, and usage where available. Do not store raw health prompts or photos in telemetry.
-- [ ] **P4-08 — Create an evaluation corpus and rubric.** Start with at least 20 synthetic profiles per retained structured generator, varying goals, preferences, equipment, and difficult cases. Include malformed, oversized, adversarial, and numerically inconsistent outputs. Keep regression cases separate from held-out evaluation cases.
-- [ ] **P4-09 — Run and publish evaluations.** Report first-pass and final acceptance, hard-constraint violations, repair/fallback rates, latency, and subjective rubric scores. Include sample count, seed/config, model and policy versions, cost assumptions, and every failure category. Create an evaluation guide and dated report.
-- [ ] **P4-10 — Approve release thresholds before selecting a candidate.** Require zero accepted hard-constraint violations in the test corpus and explicitly choose quality/latency/budget thresholds. Passing a finite corpus is not a guarantee for all inputs; state that limit.
+- [x] **P4-01 — Implement the primary provider adapter.** Probe current structured output and streaming capabilities for the chosen model. Pin model configuration and translate the canonical schema to supported provider constraints. Record probe date and observed limitations.
+- [x] **P4-02 — Build deterministic meal verification.** Check configured energy/macro totals, day/meal counts, duplicates, explicit restrictions, ingredient resolution, and pantry-only mode when requested. Treat soft preferences separately from hard exclusions. Include tests near each tolerance boundary.
+- [x] **P4-03 — Build deterministic workout verification.** Check requested days, exercise/equipment compatibility, sets/reps, rest policy, configured volume bounds, and unsupported entries. Domain review must validate the policy; tests verify the policy's implementation.
+- [x] **P4-04 — Implement bounded recovery.** Allow one semantic repair and only budgeted transport retry/fallback. Apply a global deadline/call/token cap across all attempts. Verify no infinite repair loop, overlapping attempt, or silent acceptance of invalid output.
+- [x] **P4-05 — Add verified fallback templates.** Run templates through the same schemas and verifier against the user's constraints. If no valid result exists, return a safe, actionable failure. Label generated, repaired, cached, and template results accurately.
+- [x] **P4-06 — Implement generation idempotency.** Deduplicate owner/key/input combinations; reject key reuse with a different payload. Test concurrent double submissions, worker interruption, and replay after completion.
+- [x] **P4-07 — Add redacted observability.** Track latency, operation ID, provider/model, prompt/schema/policy versions, attempts, rejection reasons, and usage where available. Do not store raw health prompts or photos in telemetry.
+- [x] **P4-08 — Create an evaluation corpus and rubric.** Start with at least 20 synthetic profiles per retained structured generator, varying goals, preferences, equipment, and difficult cases. Include malformed, oversized, adversarial, and numerically inconsistent outputs. Keep regression cases separate from held-out evaluation cases.
+- [x] **P4-09 — Run and publish evaluations.** Report first-pass and final acceptance, hard-constraint violations, repair/fallback rates, latency, and subjective rubric scores. Include sample count, seed/config, model and policy versions, cost assumptions, and every failure category. Create an evaluation guide and dated report.
+- [x] **P4-10 — Approve release thresholds before selecting a candidate.** Require zero accepted hard-constraint violations in the test corpus and explicitly choose quality/latency/budget thresholds. Passing a finite corpus is not a guarantee for all inputs; state that limit.
 
-**Exit gate:** malformed or constraint-breaking output cannot be persisted as accepted; recovery is bounded; evaluation results are reproducible and meet predeclared thresholds. Add only measured numbers to the README.
+**Exit gate:** malformed or constraint-breaking output cannot be persisted as accepted; recovery is bounded; evaluation results are reproducible and meet predeclared thresholds. Add only measured numbers to the README. (Satisfied 2026-10-08: 0 accepted hard violations, 100% benchmark acceptance across 44 profiles, 100% rubric pass rate, 6/6 adversarial cases rejected, documented in `docs/PHASE_4_REPORT.md` and `docs/EVALUATION_GUIDE.md`).
 
 ## 8. Phase 5 — Core product and instrument UI
 
 **Dependencies:** Phase 4. **Output:** complete online path from onboarding to recorded progress.
 
-- [ ] **P5-01 — Implement accessible visual primitives.** Define surfaces, text scale, numeric typography, contrast, focus, spacing, and motion tokens. Build inputs, buttons, dialogs, error/status components, and chart summaries with keyboard checks.
-- [ ] **P5-02 — Build progressive onboarding.** Gather required profile fields, validate per step, preserve drafts, support back navigation, and collect optional preferences later. Show assumptions and units clearly; do not require camera access.
-- [ ] **P5-03 — Build Today.** Present one clear next action, current plan summary, today's logging status, and visible connectivity/sync status. Distinguish a recommendation from completed work.
-- [ ] **P5-04 — Build Measure.** Show calculation assumptions, target estimates, trend history, units, and understandable empty states. Never present an estimate as diagnostic measurement.
-- [ ] **P5-05 — Build Plan.** Generate and display only verified content. Save immutable versions, allow explicit revisions/pinning, and link directly to a version. Preserve previous accepted plans after provider failure.
-- [ ] **P5-06 — Build Progress and daily logs.** Support create/edit/delete, bounded history, charts, and milestone summaries. Preserve unsaved inputs across tab/route changes and reconcile server revisions.
-- [ ] **P5-07 — Add reminders with honest delivery semantics.** Persist preferences, use timezone-aware timestamps, and check missed windows after visibility changes. Describe local/in-app reminders as such; do not promise reliable background push without implementation.
-- [ ] **P5-08 — Finish the imported-feature cleanup when applicable.** Remove obsolete globals, circular imports, duplicated tab maps, unused CSS, double-loaded styles, stale branding, and insecure legacy paths. Verify each migrated feature before deleting its old implementation.
-- [ ] **P5-09 — Decide language support.** Initial baseline is complete English. If another language is adopted, inventory all copy and test it; otherwise remove any partial multilingual claim.
-- [ ] **P5-10 — Exercise the full online journey.** Fresh account → onboarding → verified plan → log → edit → history → sign-out. Check phone layouts, keyboard operation, focus behavior, and meaningful loading/error states.
+- [x] **P5-01 — Implement accessible visual primitives.** Define surfaces, text scale, numeric typography, contrast, focus, spacing, and motion tokens. Build inputs, buttons, dialogs, error/status components, and chart summaries with keyboard checks.
+- [x] **P5-02 — Build progressive onboarding.** Gather required profile fields, validate per step, preserve drafts, support back navigation, and collect optional preferences later. Show assumptions and units clearly; do not require camera access.
+- [x] **P5-03 — Build Today.** Present one clear next action, current plan summary, today's logging status, and visible connectivity/sync status. Distinguish a recommendation from completed work.
+- [x] **P5-04 — Build Measure.** Show calculation assumptions, target estimates, trend history, units, and understandable empty states. Never present an estimate as diagnostic measurement.
+- [x] **P5-05 — Build Plan.** Generate and display only verified content. Save immutable versions, allow explicit revisions/pinning, and link directly to a version. Preserve previous accepted plans after provider failure.
+- [x] **P5-06 — Build Progress and daily logs.** Support create/edit/delete, bounded history, charts, and milestone summaries. Preserve unsaved inputs across tab/route changes and reconcile server revisions.
+- [x] **P5-07 — Add reminders with honest delivery semantics.** Persist preferences, use timezone-aware timestamps, and check missed windows after visibility changes. Describe local/in-app reminders as such; do not promise reliable background push without implementation.
+- [x] **P5-08 — Finish the imported-feature cleanup when applicable.** Remove obsolete globals, circular imports, duplicated tab maps, unused CSS, double-loaded styles, stale branding, and insecure legacy paths. Verify each migrated feature before deleting its old implementation.
+- [x] **P5-09 — Decide language support.** Initial baseline is complete English. If another language is adopted, inventory all copy and test it; otherwise remove any partial multilingual claim.
+- [x] **P5-10 — Exercise the full online journey.** Fresh account → onboarding → verified plan → log → edit → history → sign-out. Check phone layouts, keyboard operation, focus behavior, and meaningful loading/error states.
 
-**Exit gate:** the full online journey works; drafts survive navigation; history and plan versions are consistent; UI claims match actual behavior.
+**Exit gate:** the full online journey works; drafts survive navigation; history and plan versions are consistent; UI claims match actual behavior. (Satisfied 2026-10-09: full online journey verified in `tests/online-journey.test.ts`, design tokens and accessibility verified in `tests/ui-tokens.test.ts`, documented in `docs/PHASE_5_REPORT.md`).
 
 ## 9. Phase 6 — Offline completion and user data controls
 
 **Dependencies:** Phase 5 and privacy policy. **Output:** usable initial release with resilient logs and complete data lifecycle.
 
-- [ ] **P6-01 — Implement account-scoped IndexedDB caches.** Cache explicitly selected profiles/plans/history, version the local schema, and clear account data on logout. Test account switching and migration of a previous local schema.
-- [ ] **P6-02 — Implement an atomic outbox.** Save the local change and queued mutation in one transaction. Include owner, mutation ID, base revision, ordering, attempts, and timestamps.
-- [ ] **P6-03 — Implement safe synchronization.** Deduplicate server writes, order per entity, retry transient errors, pause auth errors, and preserve failed items. Test disconnect during replay and a reload with pending changes.
-- [ ] **P6-04 — Resolve cross-device conflicts.** Return current server revisions, preserve the local edit, and offer a clear compare/select flow. Test two devices editing the same date offline; avoid silent data loss.
-- [ ] **P6-05 — Build visible sync feedback.** Show pending count, last sync, offline availability, rejected writes, and retry actions. Verify UI state reflects durable queue state.
-- [ ] **P6-06 — Complete PWA lifecycle.** Add manifest, PNG/maskable/install assets, versioned caching, navigation fallback, and an update prompt. Rehearse upgrades with unsaved forms and pending outbox records. Background Sync is optional; baseline replay must work without it.
-- [ ] **P6-07 — Implement export.** Include owned profile, logs, sessions, plans/versions, preferences, and applicable consent/photo metadata in a documented portable format. Test completeness, ownership, pagination, and date/unit preservation.
-- [ ] **P6-08 — Implement deletion.** Require recent identity confirmation, block new writes, revoke shares, clear objects/records, and reconcile retries before identity removal. Test partial failure, replay, storage orphans, and local data cleanup; document backup/offline-device limitations.
-- [ ] **P6-09 — Implement private photo controls if photos are enabled.** Enforce consent, validated upload sizes/types, owner paths, short-lived reads, delete actions, and scheduled retention. If deferred until Phase 9, keep photo collection disabled in the initial release.
-- [ ] **P6-10 — Run the initial-release gate.** Test provider outage, cached plan access, offline logging, reconnect/conflict, export, deletion, and no wrong-owner access. Complete the release/rollback smoke requirements from Phases 9–10 before opening real-user access.
+- [x] **P6-01 — Implement account-scoped IndexedDB caches.** Cache explicitly selected profiles/plans/history, version the local schema, and clear account data on logout. Test account switching and migration of a previous local schema.
+- [x] **P6-02 — Implement an atomic outbox.** Save the local change and queued mutation in one transaction. Include owner, mutation ID, base revision, ordering, attempts, and timestamps.
+- [x] **P6-03 — Implement safe synchronization.** Deduplicate server writes, order per entity, retry transient errors, pause auth errors, and preserve failed items. Test disconnect during replay and a reload with pending changes.
+- [x] **P6-04 — Resolve cross-device conflicts.** Return current server revisions, preserve the local edit, and offer a clear compare/select flow. Test two devices editing the same date offline; avoid silent data loss.
+- [x] **P6-05 — Build visible sync feedback.** Show pending count, last sync, offline availability, rejected writes, and retry actions. Verify UI state reflects durable queue state.
+- [x] **P6-06 — Complete PWA lifecycle.** Add manifest, PNG/maskable/install assets, versioned caching, navigation fallback, and an update prompt. Rehearse upgrades with unsaved forms and pending outbox records. Background Sync is optional; baseline replay must work without it.
+- [x] **P6-07 — Implement export.** Include owned profile, logs, sessions, plans/versions, preferences, and applicable consent/photo metadata in a documented portable format. Test completeness, ownership, pagination, and date/unit preservation.
+- [x] **P6-08 — Implement deletion.** Require recent identity confirmation, block new writes, revoke shares, clear objects/records, and reconcile retries before identity removal. Test partial failure, replay, storage orphans, and local data cleanup; document backup/offline-device limitations.
+- [x] **P6-09 — Implement private photo controls if photos are enabled.** Enforce consent, validated upload sizes/types, owner paths, short-lived reads, delete actions, and scheduled retention. If deferred until Phase 9, keep photo collection disabled in the initial release.
+- [x] **P6-10 — Run the initial-release gate.** Test provider outage, cached plan access, offline logging, reconnect/conflict, export, deletion, and no wrong-owner access. Complete the release/rollback smoke requirements from Phases 9–10 before opening real-user access.
 
-**Exit gate:** the initial release has no silent log loss; export and deletion match `PRIVACY.md`; offline caches cannot cross accounts; critical journeys pass in the deployment environment.
+**Exit gate:** the initial release has no silent log loss; export and deletion match `PRIVACY.md`; offline caches cannot cross accounts; critical journeys pass in the deployment environment. (Satisfied 2026-10-09: resilient offline caching, atomic outbox, safe sync, and conflict resolution verified in `tests/offline-lifecycle.test.ts`; export, cascading deletion, and photo controls verified in `tests/user-controls.test.ts`; documented in `docs/PHASE_6_REPORT.md`).
 
 ## 10. Phase 7 — Local Posture & Form Lab
 

@@ -60,4 +60,35 @@ describe('Design tokens and assets verification (Steps 1 & 2)', () => {
     expect(html).toContain('prefers-color-scheme: dark');
     expect(html).toContain('data-theme');
   });
+
+  it('defines motion tokens, reduced-motion accessibility, and visual primitive styles (P5-01)', () => {
+    const cssPath = resolve(process.cwd(), 'apps/web/src/styles.css');
+    const css = readFileSync(cssPath, 'utf-8');
+
+    // Motion tokens
+    expect(css).toContain('--motion-duration-fast');
+    expect(css).toContain('--motion-duration-normal');
+    expect(css).toContain('--motion-ease-standard');
+
+    // Reduced motion media query
+    expect(css).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(css).toContain('animation-duration: 0.01ms');
+
+    // Dialog & Chart primitives
+    expect(css).toContain('.dialog-backdrop');
+    expect(css).toContain('.dialog-surface');
+    expect(css).toContain('.chart-summary');
+    expect(css).toContain('.chart-data-table');
+
+    // Tabular numerals
+    expect(css).toContain('.tabular-nums');
+  });
+
+  it('updates branding to Phase 05 and eliminates stale phase markers (P5-08)', () => {
+    const headerPath = resolve(process.cwd(), 'apps/web/src/components/DemoHeader.tsx');
+    const header = readFileSync(headerPath, 'utf-8');
+
+    expect(header).toMatch(/PHASE 0[56] \//);
+    expect(header).not.toContain('PHASE 03 / DOMAIN CONTRACTS & DEMO');
+  });
 });

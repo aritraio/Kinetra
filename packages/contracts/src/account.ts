@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { planGenerationInputSchema } from './plans';
 
 export const timezoneSchema = z
   .string()
@@ -86,4 +87,4 @@ export const consentInputSchema = z.strictObject({
   action: z.enum(['grant', 'withdraw']),
   policy_version: z.literal('2026-10-01'),
 });
-export const generationRequestSchema = z.strictObject({ kind: z.enum(['meal', 'workout']) });
+export const generationRequestSchema = planGenerationInputSchema;

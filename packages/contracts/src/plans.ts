@@ -132,3 +132,49 @@ export interface PlanWithVersion {
   plan: PlanRecord;
   current_version: PlanVersionRecord;
 }
+
+// --- Plan Verification and Generation Schemas ---
+export const planVerificationViolationSchema = z.strictObject({
+  code: z.string().trim().min(1).max(80),
+  message: z.string().trim().min(1).max(300),
+  severity: z.enum(['hard', 'soft']),
+  path: z.string().trim().max(100).optional(),
+  actual: z.union([z.number(), z.string()]).optional(),
+  expected: z.union([z.number(), z.string()]).optional(),
+});
+export type PlanVerificationViolation = z.infer<typeof planVerificationViolationSchema>;
+
+export const planVerificationResultSchema = z.strictObject({
+  valid: z.boolean(),
+  hard_violations: z.array(planVerificationViolationSchema),
+  soft_warnings: z.array(planVerificationViolationSchema),
+  metrics: z.record(z.string(), z.number()).optional(),
+});
+export type PlanVerificationResult = z.infer<typeof planVerificationResultSchema>;
+
+export const planGenerationInputSchema = z.strictObject({
+  kind: planKindSchema,
+  idempotency_key: z.string().trim().min(1).max(100).optional(),
+  target_calories: z.number().finite().min(500).max(10000).optional(),
+  target_protein_g: z.number().finite().min(20).max(800).optional(),
+  target_carbs_g: z.number().finite().min(0).max(1500).optional(),
+  target_fat_g: z.number().finite().min(10).max(500).optional(),
+  days_per_week: z.number().int().min(1).max(7).optional(),
+  split_name: z.string().trim().min(1).max(80).optional(),
+  equipment: z.array(z.string().trim().min(1).max(50)).max(30).optional(),
+  allergies: z.array(z.string().trim().min(1).max(50)).max(30).optional(),
+  dietary_preferences: z.array(z.string().trim().min(1).max(50)).max(30).optional(),
+  pantry_only: z.boolean().optional(),
+  pantry_ingredients: z.array(z.string().trim().min(1).max(80)).max(100).optional(),
+  notes: z.string().max(500).optional(),
+});
+export type PlanGenerationInput = z.infer<typeof planGenerationInputSchema>;
+
+export const planGenerationResultSchema = z.strictObject({
+  plan: planRecordSchema,
+  version: planVersionRecordSchema,
+  provenance: planVersionProvenanceSchema,
+  verification: planVerificationResultSchema,
+  replayed: z.boolean().optional(),
+});
+export type PlanGenerationResult = z.infer<typeof planGenerationResultSchema>;

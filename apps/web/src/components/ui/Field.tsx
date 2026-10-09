@@ -3,10 +3,10 @@ import { useId } from 'react';
 
 export interface FieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  unit?: string;
-  help?: string;
-  error?: string;
-  containerClassName?: string;
+  unit?: string | undefined;
+  help?: string | undefined;
+  error?: string | undefined;
+  containerClassName?: string | undefined;
 }
 
 export function Field({
@@ -64,9 +64,9 @@ export interface SelectOption {
 export interface SelectFieldProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
   options: readonly (string | SelectOption)[];
-  help?: string;
-  error?: string;
-  containerClassName?: string;
+  help?: string | undefined;
+  error?: string | undefined;
+  containerClassName?: string | undefined;
 }
 
 export function SelectField({

@@ -8,5 +8,7 @@ export * from './Tabs';
 export * from './Metric';
 export * from './MediaReference';
 export * from './FeedbackStates';
+export * from './Dialog';
+export * from './ChartSummary';
 export * from './ThemeToggle';
 export * from './Icons';
