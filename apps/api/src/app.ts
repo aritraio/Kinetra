@@ -1,4 +1,11 @@
-import { generationRequestSchema, protocolVersion, streamEventSchema } from '@kinetra/contracts';
+import {
+  type CoachMessage,
+  coachStreamEventSchema,
+  generationRequestSchema,
+  protocolVersion,
+  streamEventSchema,
+} from '@kinetra/contracts';
+import { generateCoachStream } from '@kinetra/domain';
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
@@ -136,7 +143,42 @@ export function createApp(env: ApiEnvironment, http: typeof fetch = fetch) {
     if (c.req.method !== 'POST')
       return c.json({ code: 'METHOD_NOT_ALLOWED' }, 405, { Allow: 'POST' });
     await verifyIdentity(c.req.header('Authorization'), env, http);
-    return c.json({ code: 'NOT_IMPLEMENTED', message: 'Coach stream is not yet enabled' }, 501);
+    let body: Record<string, unknown> = {};
+    try {
+      body = (await c.req.json()) as Record<string, unknown>;
+    } catch {
+      // Empty body is handled with default empty messages
+    }
+    const messages = Array.isArray(body.messages) ? (body.messages as CoachMessage[]) : [];
+    c.header('Cache-Control', 'no-store');
+    c.header('X-Accel-Buffering', 'no');
+    return streamSSE(c, async (stream) => {
+      try {
+        const coachGen = generateCoachStream({
+          messages,
+          signal: c.req.raw.signal,
+          ...(typeof body.operation_id === 'string' ? { operationId: body.operation_id } : {}),
+        });
+        for await (const event of coachGen) {
+          if (stream.aborted) break;
+          const validated = coachStreamEventSchema.parse(event);
+          await stream.writeSSE({ event: validated.type, data: JSON.stringify(validated) });
+        }
+      } catch (err: unknown) {
+        if (!stream.aborted) {
+          const errMessage = err instanceof Error ? err.message : 'Streaming failed';
+          await stream.writeSSE({
+            event: 'error',
+            data: JSON.stringify({
+              type: 'error',
+              code: 'COACH_STREAM_ERROR',
+              message: errMessage,
+              retryable: true,
+            }),
+          });
+        }
+      }
+    });
   });
   app.all('/api/plans/*', (c) => c.json({ code: 'NOT_FOUND' }, 404));
   app.post('/api/security/quota-probe', async (c) => {

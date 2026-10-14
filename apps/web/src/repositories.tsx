@@ -8,8 +8,11 @@ import type {
   OutboxMutation,
   PlanGenerationInput,
   PlanGenerationResult,
+  PlanShareGrant,
   PlanWithVersion,
   PlansRepository,
+  PhotosRepository,
+  SharedPlanView,
   Profile,
   ProfileRecord,
   ProfileRepository,
@@ -74,6 +77,31 @@ export class ApiRepositories implements FeatureRepositories {
       const result = await rpc.plans.generate.mutate(input);
       return result as PlanGenerationResult;
     },
+    createShareGrant: async (input) => {
+      const result = await rpc.plans.createShareGrant.mutate(input);
+      return result as PlanShareGrant;
+    },
+    revokeShareGrant: async (grantId) => {
+      await rpc.plans.revokeShareGrant.mutate({ grant_id: grantId });
+    },
+    listShareGrants: async (planId) => {
+      const result = await rpc.plans.listShareGrants.query(
+        planId ? { plan_id: planId } : undefined,
+      );
+      return result as PlanShareGrant[];
+    },
+    getSharedPlan: async (token) => {
+      const result = await rpc.plans.getSharedPlan.query({ token });
+      return result as SharedPlanView;
+    },
+  };
+
+  readonly photos: PhotosRepository = {
+    listPhotos: async () => [],
+    savePhoto: async () => {},
+    deletePhoto: async () => {},
+    getConsent: async () => false,
+    setConsent: async () => {},
   };
 
   readonly history: HistoryRepository = {

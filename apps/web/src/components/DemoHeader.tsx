@@ -8,6 +8,7 @@ import { SyncStatusBadge } from './ui/SyncStatusBadge';
 
 export type NavigationTab =
   | 'today'
+  | 'coach'
   | 'measure'
   | 'plan'
   | 'progress'
@@ -50,7 +51,7 @@ export function DemoHeader({
       <div className="header-top">
         <div className="branding">
           <span className="wordmark">KINETRA</span>
-          <span className="phase">PHASE 07 / LOCAL POSTURE & FORM LAB</span>
+          <span className="phase">PHASE 09 / FULL-V1 INTEGRATION & OPERATIONS HARDENING</span>
         </div>
 
         {/* Sync Status Feedback & Controls */}
@@ -121,6 +122,13 @@ export function DemoHeader({
           onClick={() => onSelectTab('today')}
         >
           Today
+        </button>
+        <button
+          type="button"
+          className={`nav-tab ${activeTab === 'coach' ? 'active' : ''}`}
+          onClick={() => onSelectTab('coach')}
+        >
+          Coach
         </button>
         <button
           type="button"

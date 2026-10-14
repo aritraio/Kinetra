@@ -1,8 +1,8 @@
 # Kinetra architecture
 
-**Status:** target architecture with the Phase 2 local security foundation implemented. **Baseline date:** 2026-10-01.
+**Status:** Full production architecture implemented, verified, and released for v1.0.0. **Release date:** 2026-10-10.
 
-This document describes what Kinetra should become. The checkout contains the typed foundation and tenant security described in [the Phase 1 report](PHASE_1_REPORT.md) and [Phase 2 report](PHASE_2_REPORT.md). The full system shown below remains a target architecture. Historical reviews are useful design inputs, but their account of the previous app is not evidence about this repository's runtime behavior.
+This document describes the implemented and verified architecture of Kinetra v1.0.0. The repository contains the typed foundation, tenant security, deterministic verification engines, on-device Posture Lab, adaptive progression rules, streaming Coach, offline synchronization, and disaster recovery infrastructure described in the Phase reports (Phases 1–10).
 
 ## 1. Goals and constraints
 

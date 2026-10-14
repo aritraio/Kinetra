@@ -1,6 +1,7 @@
 import {
   consentInputSchema,
   consentRecordExportSchema,
+  createShareGrantInputSchema,
   deletionRequestSchema,
   echoInputSchema,
   echoResultSchema,
@@ -9,13 +10,23 @@ import {
   photoMetadataExportSchema,
   photoUploadRequestSchema,
   planGenerationInputSchema,
+  planShareGrantSchema,
   planVersionRecordSchema,
   profileRecordSchema,
   profileUpdateSchema,
+  revokeShareGrantInputSchema,
+  sharedPlanViewSchema,
   trainingSessionRecordSchema,
   type ExportData,
+  type PlanShareGrant,
 } from '@kinetra/contracts';
-import { echoMessage, weightInKg } from '@kinetra/domain';
+import {
+  createPlanShareGrant,
+  echoMessage,
+  sanitizePlanForSharing,
+  validateShareGrant,
+  weightInKg,
+} from '@kinetra/domain';
 import { initTRPC, TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import type { ApiEnvironment } from './env';
@@ -29,9 +40,12 @@ import {
 import {
   GeminiProviderAdapter,
   GenerationError,
+  globalTelemetry,
   IdempotencyConflictError,
   PlanGenerationOrchestrator,
 } from './ai';
+
+const localShareGrants = new Map<string, PlanShareGrant>();
 
 export interface RequestContext {
   hasBearerHeader: boolean;
@@ -179,6 +193,71 @@ export const appRouter = t.router({
         throw error;
       }
     }),
+    createShareGrant: secured
+      .input(createShareGrantInputSchema)
+      .mutation(async ({ ctx, input }) => {
+        requireLocalWrites(ctx.env);
+        const grant = createPlanShareGrant(
+          ctx.identity.id,
+          input.plan_id,
+          input.version,
+          input.duration_days,
+        );
+        localShareGrants.set(grant.token, grant);
+        return grant;
+      }),
+    revokeShareGrant: secured
+      .input(revokeShareGrantInputSchema)
+      .mutation(async ({ ctx, input }) => {
+        requireLocalWrites(ctx.env);
+        for (const [token, grant] of localShareGrants.entries()) {
+          if (grant.id === input.grant_id && grant.owner_id === ctx.identity.id) {
+            localShareGrants.set(token, { ...grant, revoked_at: new Date().toISOString() });
+            return { revoked: true as const };
+          }
+        }
+        throw new ApiFailure('BAD_REQUEST', 'Share grant not found or not owned by caller');
+      }),
+    listShareGrants: secured
+      .input(z.object({ plan_id: z.string().uuid().optional() }).optional())
+      .query(async ({ ctx, input }) => {
+        const grants = Array.from(localShareGrants.values()).filter(
+          (g) => g.owner_id === ctx.identity.id && (!input?.plan_id || g.plan_id === input.plan_id),
+        );
+        return grants;
+      }),
+    getSharedPlan: t.procedure
+      .input(z.object({ token: z.string().min(16) }))
+      .query(async ({ ctx, input }) => {
+        const grant = localShareGrants.get(input.token);
+        if (!grant) {
+          throw new ApiFailure('BAD_REQUEST', 'Shared plan grant not found');
+        }
+        const validation = validateShareGrant(grant);
+        if (!validation.valid) {
+          throw new ApiFailure('FORBIDDEN', `Shared plan link is ${validation.reason}`);
+        }
+        // Fetch plan version rows
+        const queryIdentity: VerifiedIdentity = ctx.identity ?? {
+          id: grant.owner_id,
+          token: ctx.env.SUPABASE_SERVICE_ROLE_KEY ?? '',
+        };
+        const versionsRaw = await databaseRequest(
+          ctx.env,
+          queryIdentity,
+          `plan_versions?plan_id=eq.${grant.plan_id}&version=eq.${grant.version}&limit=1`,
+          undefined,
+          ctx.http,
+          'GET',
+          true,
+        );
+        const versions = z.array(planVersionRecordSchema).parse(versionsRaw ?? []);
+        const version = versions[0];
+        if (!version) {
+          throw new ApiFailure('BAD_REQUEST', 'Underlying plan version not found');
+        }
+        return sanitizePlanForSharing(grant, version, version.payload.kind);
+      }),
   }),
   consent: secured.input(consentInputSchema).mutation(async ({ ctx, input }) => {
     requireLocalWrites(ctx.env);
@@ -448,6 +527,10 @@ export const appRouter = t.router({
         );
         return { deleted: true as const };
       }),
+  }),
+  ops: t.router({
+    getMetrics: t.procedure.query(() => globalTelemetry.getSummary()),
+    getAlerts: t.procedure.query(() => globalTelemetry.evaluateAlerts()),
   }),
 });
 export type AppRouter = typeof appRouter;

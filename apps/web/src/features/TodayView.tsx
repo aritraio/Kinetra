@@ -1,9 +1,10 @@
 import type { LogRecord, PlanWithVersion, ProfileRecord } from '@kinetra/contracts';
 import type React from 'react';
 import { useCallback, useEffect, useState } from 'react';
-import { Button, Notice, StatusBadge } from '../components/ui';
+import { Button, StatusBadge } from '../components/ui';
 import { useRepositories } from '../repositories';
 import { checkMissedReminders, type MissedReminder } from './reminders';
+import { VoiceLogModal } from './VoiceLogModal';
 
 export function TodayView({ onNavigateToPlan }: { onNavigateToPlan: () => void }) {
   const repos = useRepositories();
@@ -18,6 +19,7 @@ export function TodayView({ onNavigateToPlan }: { onNavigateToPlan: () => void }
   const [inputCalories, setInputCalories] = useState('');
   const [inputWater, setInputWater] = useState('');
   const [logStatus, setLogStatus] = useState<string | null>(null);
+  const [isVoiceLogOpen, setIsVoiceLogOpen] = useState(false);
 
   // Sync status
   const [lastSynced, setLastSynced] = useState<string>('Just now');
@@ -190,8 +192,12 @@ export function TodayView({ onNavigateToPlan }: { onNavigateToPlan: () => void }
   }
 
   const unitWeight = profile?.units === 'imperial' ? 'lb' : 'kg';
-  const formatWeightVal = (kg: number) =>
-    profile?.units === 'imperial' ? (kg * 2.20462).toFixed(1) : kg.toFixed(1);
+  const formatWeightVal = (kg: number | undefined) =>
+    kg !== undefined
+      ? profile?.units === 'imperial'
+        ? (kg * 2.20462).toFixed(1)
+        : kg.toFixed(1)
+      : '--';
 
   return (
     <div className="feature-view">
@@ -332,7 +338,7 @@ export function TodayView({ onNavigateToPlan }: { onNavigateToPlan: () => void }
             className="tabular-nums"
           >
             {hasLoggedWeightToday
-              ? `${formatWeightVal(todayLog!.weight_kg)} ${unitWeight}`
+              ? `${formatWeightVal(todayLog?.weight_kg)} ${unitWeight}`
               : 'Not logged today'}
           </span>
         </div>
@@ -474,7 +480,17 @@ export function TodayView({ onNavigateToPlan }: { onNavigateToPlan: () => void }
         <section className="instrument card">
           <div className="card-header">
             <h2>Record Today’s Metrics</h2>
-            <span className="badge badge-muted">Date: {todayStr}</span>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <Button
+                size="small"
+                variant="quiet"
+                onClick={() => setIsVoiceLogOpen(true)}
+                title="Log weight, workout sets, or meals using your voice"
+              >
+                🎙️ Voice Log
+              </Button>
+              <span className="badge badge-muted">Date: {todayStr}</span>
+            </div>
           </div>
           <form onSubmit={handleQuickLog} className="card-content">
             <div className="input-row">
@@ -528,6 +544,12 @@ export function TodayView({ onNavigateToPlan }: { onNavigateToPlan: () => void }
           </form>
         </section>
       </div>
+
+      <VoiceLogModal
+        isOpen={isVoiceLogOpen}
+        onClose={() => setIsVoiceLogOpen(false)}
+        onSaved={() => void loadData()}
+      />
     </div>
   );
 }

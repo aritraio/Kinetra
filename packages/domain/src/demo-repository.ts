@@ -1,25 +1,30 @@
 import type {
+  CreateShareGrantInput,
   FeatureRepositories,
   HistoryRepository,
   LogRecord,
   LogsRepository,
   LogUpdate,
+  PhotosRepository,
   PlanGenerationInput,
   PlanGenerationResult,
   PlanKind,
   PlansRepository,
+  PlanShareGrant,
   PlanVersionRecord,
   PlanWithVersion,
   Profile,
   ProfileRecord,
   ProfileRepository,
   ProgressionProposal,
+  SharedPlanView,
   TrainingSessionRecord,
 } from '@kinetra/contracts';
 import { getFallbackMealPlan, getFallbackWorkoutPlan } from './fallback-templates';
 import { type MealVerificationProfile, verifyMealPlan } from './meal-verifier';
 import { SYNTHETIC_PERSONAS, type SyntheticPersona } from './personas';
 import { applyProgressionToWorkoutPlan, evaluateWorkoutProgression } from './progression';
+import { createPlanShareGrant, sanitizePlanForSharing, validateShareGrant } from './sharing';
 import { weightInKg } from './units';
 import { type WorkoutVerificationProfile, verifyWorkoutPlan } from './workout-verifier';
 
@@ -31,6 +36,15 @@ export class InMemoryDemoRepositories implements FeatureRepositories {
   private currentPlans: Map<PlanKind, PlanWithVersion>;
   private planVersions: Map<PlanKind, PlanVersionRecord[]>;
   private currentHistory: TrainingSessionRecord[];
+  private shareGrants: Map<string, PlanShareGrant> = new Map();
+  private photosConsent = false;
+  private photosList: Array<{
+    id: string;
+    url: string;
+    captured_at: string;
+    expires_at: string;
+    notes?: string;
+  }> = [];
 
   constructor(initialPersona: 'maya' | 'marcus' = 'maya') {
     this.currentPersonaId = initialPersona;
@@ -74,6 +88,7 @@ export class InMemoryDemoRepositories implements FeatureRepositories {
       ['workout', [JSON.parse(JSON.stringify(persona.workoutPlan.current_version))]],
     ]);
     this.currentHistory = persona.trainingHistory.map((s) => ({ ...s }));
+    this.shareGrants.clear();
   }
 
   readonly profile: ProfileRepository = {
@@ -386,6 +401,43 @@ export class InMemoryDemoRepositories implements FeatureRepositories {
 
       return JSON.parse(JSON.stringify(updatedPlan));
     },
+    createShareGrant: async (input: CreateShareGrantInput): Promise<PlanShareGrant> => {
+      const grant = createPlanShareGrant(
+        this.currentProfile.owner_id,
+        input.plan_id,
+        input.version,
+        input.duration_days,
+      );
+      this.shareGrants.set(grant.token, grant);
+      return { ...grant };
+    },
+    revokeShareGrant: async (grantId: string): Promise<void> => {
+      for (const [token, grant] of this.shareGrants.entries()) {
+        if (grant.id === grantId) {
+          this.shareGrants.set(token, { ...grant, revoked_at: new Date().toISOString() });
+          return;
+        }
+      }
+    },
+    listShareGrants: async (planId?: string): Promise<PlanShareGrant[]> => {
+      const all = Array.from(this.shareGrants.values());
+      return planId ? all.filter((g) => g.plan_id === planId) : all;
+    },
+    getSharedPlan: async (token: string): Promise<SharedPlanView> => {
+      const grant = this.shareGrants.get(token);
+      if (!grant) {
+        throw new Error('Share link not found or invalid token');
+      }
+      const validation = validateShareGrant(grant);
+      if (!validation.valid) {
+        throw new Error(`Share link is ${validation.reason}`);
+      }
+      const plan = Array.from(this.currentPlans.values()).find((p) => p.plan.id === grant.plan_id);
+      if (!plan) {
+        throw new Error('Referenced plan no longer exists');
+      }
+      return sanitizePlanForSharing(grant, plan.current_version, plan.plan.kind);
+    },
   };
 
   addSession(session: TrainingSessionRecord): void {
@@ -399,6 +451,37 @@ export class InMemoryDemoRepositories implements FeatureRepositories {
     getSession: async (id: string): Promise<TrainingSessionRecord | null> => {
       const session = this.currentHistory.find((s) => s.id === id);
       return session ? { ...session } : null;
+    },
+  };
+
+  readonly photos: PhotosRepository = {
+    listPhotos: async () => {
+      return [...this.photosList];
+    },
+    savePhoto: async (photo) => {
+      if (!this.photosConsent) {
+        throw new Error('Photo consent required before saving photos');
+      }
+      const expiresAt = new Date(Date.now() + 30 * 86400 * 1000).toISOString();
+      this.photosList.unshift({
+        id: photo.id,
+        url: photo.url,
+        captured_at: photo.captured_at,
+        expires_at: expiresAt,
+        ...(photo.notes ? { notes: photo.notes } : {}),
+      });
+    },
+    deletePhoto: async (id: string) => {
+      this.photosList = this.photosList.filter((p) => p.id !== id);
+    },
+    getConsent: async () => {
+      return this.photosConsent;
+    },
+    setConsent: async (granted: boolean) => {
+      this.photosConsent = granted;
+      if (!granted) {
+        this.photosList = [];
+      }
     },
   };
 }

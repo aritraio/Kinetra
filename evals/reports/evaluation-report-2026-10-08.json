@@ -9,15 +9,15 @@
     "total_samples": 44,
     "accepted_samples": 44,
     "final_acceptance_rate": 1,
-    "first_pass_rate": 0.9772727272727273,
+    "first_pass_rate": 1,
     "repair_rate": 0,
-    "fallback_rate": 0.022727272727272728,
+    "fallback_rate": 0,
     "accepted_hard_violations": 0,
     "rubric_pass_rate": 1,
     "average_rubric_score": 99.2,
     "latency_p50_ms": 0,
     "latency_p95_ms": 2,
-    "average_cost_usd": 0.00021429599999999997
+    "average_cost_usd": 0.00020848799999999986
   },
   "release_gates": {
     "approved": true,
@@ -33,7 +33,7 @@
   },
   "detailed_rubric": [
     {
-      "plan_id": "bc74650f-1e12-45f2-9ed9-98aec9faea37",
+      "plan_id": "395d3b70-94bf-4599-a011-f4da3cb4ed43",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -47,7 +47,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "3d8dee57-ea8b-4343-929d-7245973926d8",
+      "plan_id": "95f7917e-1e9f-489c-acac-c964550b60e4",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -61,7 +61,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "b4514a3d-4e50-49ad-b73d-f5ec8b8c1007",
+      "plan_id": "9735fb2e-d2ab-4330-809c-9c95db8ed775",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -75,7 +75,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "2e9f00b3-a562-4673-9dc1-5c50063c77ef",
+      "plan_id": "121d3ce5-111d-458a-8752-990ede19a792",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -89,7 +89,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "339dbeb1-05d1-4d79-b013-713437ac867c",
+      "plan_id": "1e7da62e-852d-4d60-a6ad-6b18aea7c31a",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -103,7 +103,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "584b3048-aa0a-4a21-a192-7bddd8f99acf",
+      "plan_id": "c9671868-b491-452d-b0d0-f74a7d84c941",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -117,7 +117,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "8822d947-9afc-4cd2-a82a-7b395ebb8dea",
+      "plan_id": "726397b0-f37c-4fd7-ad15-d16aa1e2dab4",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -131,7 +131,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "4064e0df-9796-4666-9a39-344bb254140e",
+      "plan_id": "9b80948b-bbc4-4015-9973-150297466067",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -145,7 +145,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "19b4a01b-d2f7-46bb-8845-267479d68924",
+      "plan_id": "60d4d6ea-340e-4efc-8d45-13c400909e45",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -159,7 +159,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "600c0561-dcee-40cc-8e1f-fd808f5c29a2",
+      "plan_id": "08b7b5a1-4a01-4ddb-9e95-0518bb43c1b4",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -173,7 +173,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "d24bec00-81cb-46ab-8bc2-ed3c80f6ea2d",
+      "plan_id": "7337133e-722d-4ff6-a948-0b24f5c26aba",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -187,7 +187,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "8a697cd5-5708-44aa-b3e1-0a95fa6a8ffa",
+      "plan_id": "13a08918-56da-4e56-a31d-5817150e69f9",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -201,7 +201,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "3712b87f-9bd9-4ffc-b43a-83d9f4dcb620",
+      "plan_id": "bac4464d-7b20-422d-abe6-84e1ef2be4ab",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -215,7 +215,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "d93c15fc-de0b-4966-ac2b-a3cac8928d11",
+      "plan_id": "c3c44919-8c2c-4a99-92d8-0e2671d9286c",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -229,7 +229,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "449405cc-dcb9-467c-b624-0b59c579ff21",
+      "plan_id": "74f62fed-fb13-40f0-bf71-4480cc5418e2",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -243,7 +243,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "9b17f07a-35db-4360-99e8-3bc68cd4338f",
+      "plan_id": "ec4fdfda-6933-4aeb-af06-12c0d2b2aff6",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -257,7 +257,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "33bf93de-7c4a-4439-837b-b608d8057d47",
+      "plan_id": "7f43416a-9779-4a0a-b70c-d99d8c672b62",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -271,7 +271,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "767d0898-d72d-4e3c-8cc5-a94617451b64",
+      "plan_id": "94aceff5-4d6a-4528-b841-55008b8b31e7",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -285,7 +285,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "0ceff90e-8931-49c4-80c8-1992b5532e0c",
+      "plan_id": "9d05d0f8-3167-45d1-bd83-45b34afc13a7",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -299,7 +299,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "057eab36-32ef-4f73-82fd-b25378a28c10",
+      "plan_id": "c81036ee-f8fd-4a04-8ff5-14c07cb39234",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -313,7 +313,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "dd6c3d29-6c04-430f-90ea-8d441ca5d924",
+      "plan_id": "d1107c85-daf0-4b40-b444-162456894929",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -327,7 +327,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "74dcbbb6-ffdf-42d7-a8f8-bfbaf4f42faa",
+      "plan_id": "9c072d17-3703-479a-b5a5-618c3fd17503",
       "kind": "meal",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -341,7 +341,7 @@
       "notes": "Meets nutritional accuracy and constraint criteria."
     },
     {
-      "plan_id": "a4490b87-96af-43af-8b91-0a34aaa7e88d",
+      "plan_id": "0bac849d-5022-48ea-a480-2d9b27ff6726",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -355,7 +355,7 @@
       "notes": "Meets biomechanical volume and equipment constraints."
     },
     {
-      "plan_id": "d0a89bef-a01a-42e0-9f5c-63c7fcbf627c",
+      "plan_id": "5e0510fc-75db-437d-b58e-ddc39aaf96a6",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -369,49 +369,7 @@
       "notes": "Meets biomechanical volume and equipment constraints."
     },
     {
-      "plan_id": "d064268c-9dfb-466f-8d44-05f46e53e4e8",
-      "kind": "workout",
-      "schema_score": 20,
-      "hard_constraint_score": 30,
-      "target_accuracy_score": 20,
-      "macro_quality_score": 15,
-      "balance_score": 9,
-      "total_score": 94,
-      "passed_threshold": true,
-      "hard_violation_count": 0,
-      "soft_warning_count": 2,
-      "notes": "Meets biomechanical volume and equipment constraints."
-    },
-    {
-      "plan_id": "40a51264-7d21-46f0-afbb-51fd3b68d785",
-      "kind": "workout",
-      "schema_score": 20,
-      "hard_constraint_score": 30,
-      "target_accuracy_score": 20,
-      "macro_quality_score": 15,
-      "balance_score": 15,
-      "total_score": 100,
-      "passed_threshold": true,
-      "hard_violation_count": 0,
-      "soft_warning_count": 0,
-      "notes": "Meets biomechanical volume and equipment constraints."
-    },
-    {
-      "plan_id": "f8fc2abf-c599-4579-a9cf-3a6e01b17adf",
-      "kind": "workout",
-      "schema_score": 20,
-      "hard_constraint_score": 30,
-      "target_accuracy_score": 20,
-      "macro_quality_score": 15,
-      "balance_score": 15,
-      "total_score": 100,
-      "passed_threshold": true,
-      "hard_violation_count": 0,
-      "soft_warning_count": 0,
-      "notes": "Meets biomechanical volume and equipment constraints."
-    },
-    {
-      "plan_id": "12e146ac-29c4-4e7f-92f5-d19109f6dc80",
+      "plan_id": "10d79c4c-aea8-45bc-b38c-c88f29758709",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -425,7 +383,7 @@
       "notes": "Meets biomechanical volume and equipment constraints."
     },
     {
-      "plan_id": "1eacbeee-65cf-4086-86c8-00a48fb6bfb8",
+      "plan_id": "ff4e7199-e185-48ac-b7b0-9b2ed8df2e67",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -439,7 +397,21 @@
       "notes": "Meets biomechanical volume and equipment constraints."
     },
     {
-      "plan_id": "aa49670e-8714-4045-a250-65b211d92b95",
+      "plan_id": "7b278510-81f8-48df-b08b-f61228ee36ea",
+      "kind": "workout",
+      "schema_score": 20,
+      "hard_constraint_score": 30,
+      "target_accuracy_score": 20,
+      "macro_quality_score": 15,
+      "balance_score": 15,
+      "total_score": 100,
+      "passed_threshold": true,
+      "hard_violation_count": 0,
+      "soft_warning_count": 0,
+      "notes": "Meets biomechanical volume and equipment constraints."
+    },
+    {
+      "plan_id": "79a76aca-f541-4312-97c7-ed7dc03ec583",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -453,7 +425,7 @@
       "notes": "Meets biomechanical volume and equipment constraints."
     },
     {
-      "plan_id": "3b8ca63c-fb97-4da0-ba3e-0909dbe3edd0",
+      "plan_id": "9a99cb31-bb07-481b-93e6-78a4d3d95418",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -467,7 +439,21 @@
       "notes": "Meets biomechanical volume and equipment constraints."
     },
     {
-      "plan_id": "0b603882-c347-48bd-b230-11c54d7634dc",
+      "plan_id": "1d04d74a-42de-4b40-b987-5ec2e8854e14",
+      "kind": "workout",
+      "schema_score": 20,
+      "hard_constraint_score": 30,
+      "target_accuracy_score": 20,
+      "macro_quality_score": 15,
+      "balance_score": 9,
+      "total_score": 94,
+      "passed_threshold": true,
+      "hard_violation_count": 0,
+      "soft_warning_count": 2,
+      "notes": "Meets biomechanical volume and equipment constraints."
+    },
+    {
+      "plan_id": "cbe741a4-6a8e-4622-b2ca-bbf08ceb0498",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -481,7 +467,7 @@
       "notes": "Meets biomechanical volume and equipment constraints."
     },
     {
-      "plan_id": "e66b1b82-2a65-4371-81f6-4c890c31458c",
+      "plan_id": "4315c7e5-3e1e-4b49-96c6-f3b3b44a2f9d",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -495,7 +481,7 @@
       "notes": "Meets biomechanical volume and equipment constraints."
     },
     {
-      "plan_id": "c3515b21-ccc8-4719-84f0-75c3bacd7391",
+      "plan_id": "80a9ba6f-5409-4fa4-af0d-0a24c5c3db3b",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -509,7 +495,21 @@
       "notes": "Meets biomechanical volume and equipment constraints."
     },
     {
-      "plan_id": "9fc9516e-7561-4d1a-b907-1805b2f8bfd0",
+      "plan_id": "cf88f6c8-f179-46ca-b180-1a929cfdd0df",
+      "kind": "workout",
+      "schema_score": 20,
+      "hard_constraint_score": 30,
+      "target_accuracy_score": 20,
+      "macro_quality_score": 15,
+      "balance_score": 15,
+      "total_score": 100,
+      "passed_threshold": true,
+      "hard_violation_count": 0,
+      "soft_warning_count": 0,
+      "notes": "Meets biomechanical volume and equipment constraints."
+    },
+    {
+      "plan_id": "e8bb367c-8427-4f8b-8649-9c81ea70fbc7",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -523,7 +523,7 @@
       "notes": "Meets biomechanical volume and equipment constraints."
     },
     {
-      "plan_id": "ef39819b-f78b-4b37-812b-dc9ab5e1a13d",
+      "plan_id": "f36873cd-b30b-49d9-883c-3adecbd51488",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -537,7 +537,7 @@
       "notes": "Meets biomechanical volume and equipment constraints."
     },
     {
-      "plan_id": "8df56ee8-f0d1-492f-8796-9bd44eba4362",
+      "plan_id": "0aa2ec6d-f577-4241-be63-ba78d9668b71",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -551,7 +551,7 @@
       "notes": "Meets biomechanical volume and equipment constraints."
     },
     {
-      "plan_id": "4d9abb69-e8c3-41e3-b795-371978336ca3",
+      "plan_id": "b5d07b68-09f9-475c-9a22-149bf18ba042",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -565,7 +565,7 @@
       "notes": "Meets biomechanical volume and equipment constraints."
     },
     {
-      "plan_id": "ef03f5a7-947a-4e34-867b-bf0356c6283f",
+      "plan_id": "edc532a0-add9-49e7-8fce-a5dd4df6f93e",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -579,7 +579,7 @@
       "notes": "Meets biomechanical volume and equipment constraints."
     },
     {
-      "plan_id": "1b756e0f-014a-4a5c-b0fc-64cfc363ac50",
+      "plan_id": "c6d8f19a-2ecd-459a-b611-9c002d99679e",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -593,7 +593,7 @@
       "notes": "Meets biomechanical volume and equipment constraints."
     },
     {
-      "plan_id": "082cf426-5a92-4502-80ec-367b698560aa",
+      "plan_id": "7bc9d9f8-c567-4ff1-b8d4-1fc17dfda541",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -607,7 +607,7 @@
       "notes": "Meets biomechanical volume and equipment constraints."
     },
     {
-      "plan_id": "45dcdfb5-a597-4dd8-a0d9-f5f310f48162",
+      "plan_id": "c1078267-48b4-4a93-8505-86bb17b694c1",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -621,7 +621,7 @@
       "notes": "Meets biomechanical volume and equipment constraints."
     },
     {
-      "plan_id": "fdc6ecd7-6fbd-48d5-a4d8-14c965ad1b22",
+      "plan_id": "e7752e21-2b93-474d-8c26-ec1bb59f757c",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,
@@ -635,7 +635,7 @@
       "notes": "Meets biomechanical volume and equipment constraints."
     },
     {
-      "plan_id": "18c5edcd-d25b-4074-9ee6-523cb70db4e4",
+      "plan_id": "7c6cf4b4-f45b-4675-ac19-1e35a49f0432",
       "kind": "workout",
       "schema_score": 20,
       "hard_constraint_score": 30,

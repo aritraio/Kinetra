@@ -1,12 +1,15 @@
 import type {
+  CreateShareGrantInput,
   FeatureRepositories,
   HistoryRepository,
   LogRecord,
   LogsRepository,
   LogUpdate,
+  PhotosRepository,
   PlanGenerationInput,
   PlanGenerationResult,
   PlanKind,
+  PlanShareGrant,
   PlanVersionRecord,
   PlanWithVersion,
   PlansRepository,
@@ -14,11 +17,14 @@ import type {
   ProfileRecord,
   ProfileRepository,
   ProgressionProposal,
+  SharedPlanView,
   TrainingSessionRecord,
 } from '@kinetra/contracts';
 import {
   applyProgressionToWorkoutPlan,
+  createPlanShareGrant,
   evaluateWorkoutProgression,
+  sanitizePlanForSharing,
   weightInKg,
 } from '@kinetra/domain';
 import type { KinetraDatabase } from './db';
@@ -304,6 +310,27 @@ export class OfflineFirstRepositories implements FeatureRepositories {
       });
       return updatedPlan;
     },
+    createShareGrant: async (input: CreateShareGrantInput): Promise<PlanShareGrant> => {
+      const activeWorkout = await this.plans.getPlan('workout');
+      const planId = input.plan_id || activeWorkout?.plan.id || crypto.randomUUID();
+      return createPlanShareGrant(this.ownerId, planId, input.version, input.duration_days);
+    },
+    revokeShareGrant: async (_grantId: string): Promise<void> => {
+      // Local offline stub
+    },
+    listShareGrants: async (): Promise<PlanShareGrant[]> => {
+      return [];
+    },
+    getSharedPlan: async (_token: string): Promise<SharedPlanView> => {
+      const activeWorkout = await this.plans.getPlan('workout');
+      if (!activeWorkout) throw new Error('No workout plan available');
+      const grant = createPlanShareGrant(
+        this.ownerId,
+        activeWorkout.plan.id,
+        activeWorkout.current_version.version,
+      );
+      return sanitizePlanForSharing(grant, activeWorkout.current_version, 'workout');
+    },
   };
 
   readonly history: HistoryRepository = {
@@ -333,6 +360,52 @@ export class OfflineFirstRepositories implements FeatureRepositories {
         return await this.historyRemote.getSession(id);
       }
       return null;
+    },
+  };
+
+  readonly photos: PhotosRepository = {
+    listPhotos: async () => {
+      const rec = await this.db.sync_meta.get('photos_list');
+      return rec
+        ? (JSON.parse(rec.value) as Array<{
+            id: string;
+            url: string;
+            captured_at: string;
+            expires_at: string;
+            notes?: string;
+          }>)
+        : [];
+    },
+    savePhoto: async (photo) => {
+      const consent = await this.photos.getConsent();
+      if (!consent) {
+        throw new Error('Photo consent required before saving photos');
+      }
+      const list = await this.photos.listPhotos();
+      const expiresAt = new Date(Date.now() + 30 * 86400 * 1000).toISOString();
+      list.unshift({
+        id: photo.id,
+        url: photo.url,
+        captured_at: photo.captured_at,
+        expires_at: expiresAt,
+        ...(photo.notes ? { notes: photo.notes } : {}),
+      });
+      await this.db.sync_meta.put({ key: 'photos_list', value: JSON.stringify(list) });
+    },
+    deletePhoto: async (id: string) => {
+      const list = await this.photos.listPhotos();
+      const filtered = list.filter((p) => p.id !== id);
+      await this.db.sync_meta.put({ key: 'photos_list', value: JSON.stringify(filtered) });
+    },
+    getConsent: async () => {
+      const rec = await this.db.sync_meta.get('photos_consent');
+      return rec?.value === 'true';
+    },
+    setConsent: async (granted: boolean) => {
+      await this.db.sync_meta.put({ key: 'photos_consent', value: String(granted) });
+      if (!granted) {
+        await this.db.sync_meta.delete('photos_list');
+      }
     },
   };
 }

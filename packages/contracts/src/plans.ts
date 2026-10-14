@@ -179,3 +179,44 @@ export const planGenerationResultSchema = z.strictObject({
   replayed: z.boolean().optional(),
 });
 export type PlanGenerationResult = z.infer<typeof planGenerationResultSchema>;
+
+// --- Plan Sharing Contracts (P9-03) ---
+export const planShareGrantSchema = z.strictObject({
+  id: z.string().uuid(),
+  plan_id: z.string().uuid(),
+  owner_id: z.string().uuid(),
+  version: z.number().int().positive(),
+  token: z.string().min(16).max(128),
+  created_at: z.string(),
+  expires_at: z.string(),
+  revoked_at: z.string().nullable(),
+});
+export type PlanShareGrant = z.infer<typeof planShareGrantSchema>;
+
+export const createShareGrantInputSchema = z.strictObject({
+  plan_id: z.string().uuid(),
+  version: z.number().int().positive(),
+  duration_days: z.number().int().min(1).max(30).default(7),
+});
+export type CreateShareGrantInput = z.infer<typeof createShareGrantInputSchema>;
+
+export const revokeShareGrantInputSchema = z.strictObject({
+  grant_id: z.string().uuid(),
+});
+export type RevokeShareGrantInput = z.infer<typeof revokeShareGrantInputSchema>;
+
+/**
+ * Public, privacy-sanitized view of a shared plan.
+ * Strictly excludes owner profile, biometrics, logs, photos, and user ID.
+ */
+export const sharedPlanViewSchema = z.strictObject({
+  share_id: z.string().uuid(),
+  kind: planKindSchema,
+  version: z.number().int().positive(),
+  payload: planPayloadSchema,
+  created_at: z.string(),
+  expires_at: z.string(),
+  policy_version: z.literal('2026-10-01'),
+  schema_version: z.literal('2026-10-01'),
+});
+export type SharedPlanView = z.infer<typeof sharedPlanViewSchema>;

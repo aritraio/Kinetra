@@ -5,9 +5,7 @@ import {
   calculateMacroDistribution,
   calculateTdee,
   type FitnessGoal,
-  weightInKg,
 } from '@kinetra/domain';
-import type React from 'react';
 import { useEffect, useState } from 'react';
 import { Button, Field, Notice, SelectField } from '../components/ui';
 import { useRepositories } from '../repositories';

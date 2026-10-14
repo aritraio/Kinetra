@@ -3,8 +3,8 @@ import { localDateSchema, timezoneSchema } from './account';
 
 export const voiceExtractionInputSchema = z.strictObject({
   transcript: z.string().trim().min(1).max(2000),
-  timezone: timezoneSchema,
-  local_date: localDateSchema,
+  timezone: timezoneSchema.optional(),
+  local_date: localDateSchema.optional(),
 });
 export type VoiceExtractionInput = z.infer<typeof voiceExtractionInputSchema>;
 

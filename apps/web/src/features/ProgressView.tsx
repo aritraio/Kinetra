@@ -36,7 +36,7 @@ export function ProgressView() {
   const repos = useRepositories();
   const [profile, setProfile] = useState<ProfileRecord | null>(null);
   const [logs, setLogs] = useState<LogRecord[]>([]);
-  const [sessions, setSessions] = useState<TrainingSessionRecord[]>([]);
+  const [_sessions, setSessions] = useState<TrainingSessionRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Form modal & draft state
@@ -53,16 +53,40 @@ export function ProgressView() {
   // Revision conflict state
   const [conflictNotice, setConflictNotice] = useState<string | null>(null);
 
+  // Progress photos state (P9-04)
+  const [photosConsent, setPhotosConsent] = useState(false);
+  const [photos, setPhotos] = useState<
+    Array<{
+      id: string;
+      url: string;
+      captured_at: string;
+      expires_at: string;
+      notes?: string | undefined;
+    }>
+  >([]);
+  const [photoToDelete, setPhotoToDelete] = useState<{
+    id: string;
+    notes?: string | undefined;
+  } | null>(null);
+  const [isDeletingPhoto, setIsDeletingPhoto] = useState(false);
+  const [isAddPhotoOpen, setIsAddPhotoOpen] = useState(false);
+  const [newPhotoNotes, setNewPhotoNotes] = useState('');
+  const [isSavingPhoto, setIsSavingPhoto] = useState(false);
+
   const loadData = useCallback(async () => {
     try {
-      const [p, l, s] = await Promise.all([
+      const [p, l, s, consent, phList] = await Promise.all([
         repos.profile.getProfile(),
         repos.logs.listLogs(30),
         repos.history.listSessions(10),
+        repos.photos?.getConsent() ?? Promise.resolve(false),
+        repos.photos?.listPhotos() ?? Promise.resolve([]),
       ]);
       setProfile(p);
       setLogs(l);
       setSessions(s);
+      setPhotosConsent(Boolean(consent));
+      setPhotos(phList);
     } finally {
       setLoading(false);
     }
@@ -210,6 +234,46 @@ export function ProgressView() {
       alert(err instanceof Error ? err.message : 'Deletion failed');
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleGrantPhotoConsent = async () => {
+    await repos.photos?.setConsent(true);
+    await loadData();
+  };
+
+  const handleWithdrawPhotoConsent = async () => {
+    await repos.photos?.setConsent(false);
+    await loadData();
+  };
+
+  const handleDeletePhoto = async () => {
+    if (!photoToDelete || !repos.photos) return;
+    setIsDeletingPhoto(true);
+    try {
+      await repos.photos.deletePhoto(photoToDelete.id);
+      setPhotoToDelete(null);
+      await loadData();
+    } finally {
+      setIsDeletingPhoto(false);
+    }
+  };
+
+  const handleAddPhoto = async () => {
+    if (!repos.photos) return;
+    setIsSavingPhoto(true);
+    try {
+      await repos.photos.savePhoto({
+        id: crypto.randomUUID(),
+        url: '/design/assets/photos/front-relaxed.svg',
+        captured_at: new Date().toISOString(),
+        notes: newPhotoNotes || 'Physique check-in',
+      });
+      setIsAddPhotoOpen(false);
+      setNewPhotoNotes('');
+      await loadData();
+    } finally {
+      setIsSavingPhoto(false);
     }
   };
 
@@ -431,6 +495,151 @@ export function ProgressView() {
         </div>
       </section>
 
+      {/* OPTIONAL PROGRESS PHOTOS TIMELINE & COMPARISON (P9-04) */}
+      <section className="card" style={{ marginTop: '24px' }}>
+        <div
+          className="card-header"
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '12px',
+          }}
+        >
+          <div>
+            <h2>Progress Photos</h2>
+            <p
+              style={{ margin: '4px 0 0', fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}
+            >
+              Optional, private visual timeline. Auto-expires in 30 days. No body-fat scoring.
+            </p>
+          </div>
+          {photosConsent && (
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <Button size="small" variant="primary" onClick={() => setIsAddPhotoOpen(true)}>
+                + Add Photo Check-In
+              </Button>
+              <Button size="small" variant="quiet" onClick={handleWithdrawPhotoConsent}>
+                Withdraw Consent & Purge
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {!photosConsent ? (
+          <div
+            style={{
+              padding: '16px',
+              background: 'var(--surface-secondary, #1e2230)',
+              borderRadius: '8px',
+              marginTop: '12px',
+            }}
+          >
+            <p style={{ fontSize: 'var(--text-sm)', margin: '0 0 12px' }}>
+              Progress photos require explicit, separate consent (purpose <code>photo_storage</code>
+              ). Photographs remain local to your account, are strictly deleted after at most 30
+              days, and are never used for AI model training or clinical diagnostics.
+            </p>
+            <Button variant="primary" size="small" onClick={handleGrantPhotoConsent}>
+              Grant Photo Storage Consent
+            </Button>
+          </div>
+        ) : (
+          <div style={{ marginTop: '16px' }}>
+            {photos.length === 0 ? (
+              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>
+                No photos recorded yet. Tap "+ Add Photo Check-In" to log your first progress
+                check-in.
+              </p>
+            ) : (
+              <div>
+                {/* Timeline / Comparison Cards Grid */}
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                    gap: '16px',
+                  }}
+                >
+                  {photos.map((ph, idx) => {
+                    const daysRemaining = Math.max(
+                      0,
+                      Math.ceil((new Date(ph.expires_at).getTime() - Date.now()) / (86400 * 1000)),
+                    );
+                    return (
+                      <div
+                        key={ph.id}
+                        style={{
+                          border: '1px solid var(--border)',
+                          borderRadius: '8px',
+                          overflow: 'hidden',
+                          background: 'var(--surface)',
+                        }}
+                      >
+                        <div
+                          style={{
+                            height: '180px',
+                            background: 'var(--surface-secondary, #252836)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'var(--text-muted)',
+                            fontSize: 'var(--text-sm)',
+                            borderBottom: '1px solid var(--border)',
+                          }}
+                        >
+                          <span
+                            role="img"
+                            aria-label={`Physique check-in photo taken ${new Date(ph.captured_at).toLocaleDateString()}`}
+                          >
+                            📷 Check-In #{idx + 1}
+                          </span>
+                        </div>
+                        <div style={{ padding: '12px' }}>
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <strong style={{ fontSize: 'var(--text-xs)' }}>
+                              {new Date(ph.captured_at).toLocaleDateString()}
+                            </strong>
+                            <span className="badge" style={{ fontSize: '10px' }}>
+                              Retained {daysRemaining}d
+                            </span>
+                          </div>
+                          <p
+                            style={{
+                              margin: '6px 0 10px',
+                              fontSize: 'var(--text-xs)',
+                              color: 'var(--text-muted)',
+                            }}
+                          >
+                            {ph.notes || 'Physique check-in'}
+                          </p>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <Button
+                              size="small"
+                              variant="quiet"
+                              onClick={() => setPhotoToDelete(ph)}
+                            >
+                              Delete Photo
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </section>
+
       {/* CREATE / EDIT DAILY LOG MODAL */}
       <Dialog
         isOpen={isFormOpen}
@@ -542,6 +751,60 @@ export function ProgressView() {
           </Button>
           <Button variant="primary" onClick={handleDeleteLog} loading={isDeleting}>
             Delete Log
+          </Button>
+        </div>
+      </Dialog>
+
+      {/* ADD PHOTO DIALOG */}
+      <Dialog
+        isOpen={isAddPhotoOpen}
+        onClose={() => setIsAddPhotoOpen(false)}
+        title="Add Progress Photo Check-In"
+        description="Records an optional private progress photo with a 30-day retention countdown."
+        size="small"
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <Field
+            label="Photo Check-In Notes"
+            value={newPhotoNotes}
+            onChange={(e) => setNewPhotoNotes(e.target.value)}
+            placeholder="e.g. Week 4 check-in (front relaxed)"
+          />
+          <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
+            Photo data is saved privately and will automatically expire in 30 days.
+          </p>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+            <Button
+              variant="quiet"
+              onClick={() => setIsAddPhotoOpen(false)}
+              disabled={isSavingPhoto}
+            >
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleAddPhoto} loading={isSavingPhoto}>
+              Save Photo Check-In
+            </Button>
+          </div>
+        </div>
+      </Dialog>
+
+      {/* DELETE PHOTO DIALOG */}
+      <Dialog
+        isOpen={Boolean(photoToDelete)}
+        onClose={() => setPhotoToDelete(null)}
+        title="Delete Progress Photo"
+        description="Are you sure you want to delete this photo check-in? It will be immediately purged from local storage."
+        size="small"
+        role="alertdialog"
+      >
+        <div
+          style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px' }}
+        >
+          <Button variant="quiet" onClick={() => setPhotoToDelete(null)} disabled={isDeletingPhoto}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleDeletePhoto} loading={isDeletingPhoto}>
+            Purge Photo
           </Button>
         </div>
       </Dialog>

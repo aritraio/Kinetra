@@ -30,6 +30,33 @@ export interface PlansRepository {
     proposal: import('./progression').ProgressionProposal,
     acceptedExerciseIds?: string[],
   ): Promise<PlanWithVersion>;
+  createShareGrant(
+    input: import('./plans').CreateShareGrantInput,
+  ): Promise<import('./plans').PlanShareGrant>;
+  revokeShareGrant(grantId: string): Promise<void>;
+  listShareGrants(planId?: string): Promise<import('./plans').PlanShareGrant[]>;
+  getSharedPlan(token: string): Promise<import('./plans').SharedPlanView>;
+}
+
+export interface PhotosRepository {
+  listPhotos(): Promise<
+    Array<{
+      id: string;
+      url: string;
+      captured_at: string;
+      expires_at: string;
+      notes?: string | undefined;
+    }>
+  >;
+  savePhoto(photo: {
+    id: string;
+    url: string;
+    captured_at: string;
+    notes?: string | undefined;
+  }): Promise<void>;
+  deletePhoto(id: string): Promise<void>;
+  getConsent(): Promise<boolean>;
+  setConsent(granted: boolean): Promise<void>;
 }
 
 export interface HistoryRepository {
@@ -42,6 +69,7 @@ export interface FeatureRepositories {
   readonly logs: LogsRepository;
   readonly plans: PlansRepository;
   readonly history: HistoryRepository;
+  readonly photos?: PhotosRepository;
   readonly isDemo: boolean;
   resetDemo?(): Promise<void>;
 }

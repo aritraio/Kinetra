@@ -1,21 +1,37 @@
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { createRootRoute, createRoute, createRouter, RouterProvider } from '@tanstack/react-router';
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { AccountPanel } from './account';
 import { rpc } from './client';
 import { DemoHeader, type NavigationTab } from './components/DemoHeader';
 import { webEnvironment } from './env';
-import { MeasureView } from './features/MeasureView';
 import { OnboardingView } from './features/OnboardingView';
-import { PlanView } from './features/PlanView';
-import { PostureLabView } from './features/PostureLabView';
-import { ProgressView } from './features/ProgressView';
 import { TodayView } from './features/TodayView';
 import { RepositoryProvider } from './repositories';
 import { consumeStream } from './stream';
 import { ThemeProvider } from './theme';
 import './styles.css';
+
+const CoachView = lazy(() =>
+  import('./features/CoachView').then((m) => ({ default: m.CoachView })),
+);
+const MeasureView = lazy(() =>
+  import('./features/MeasureView').then((m) => ({ default: m.MeasureView })),
+);
+const PlanView = lazy(() => import('./features/PlanView').then((m) => ({ default: m.PlanView })));
+const ProgressView = lazy(() =>
+  import('./features/ProgressView').then((m) => ({ default: m.ProgressView })),
+);
+const PostureLabView = lazy(() =>
+  import('./features/PostureLabView').then((m) => ({ default: m.PostureLabView })),
+);
+const SharedPlanView = lazy(() =>
+  import('./features/SharedPlanView').then((m) => ({ default: m.SharedPlanView })),
+);
+const OpsDashboard = lazy(() =>
+  import('./features/OpsDashboard').then((m) => ({ default: m.OpsDashboard })),
+);
 
 function FoundationPanel() {
   const echo = useQuery({
@@ -108,13 +124,20 @@ function FoundationPanel() {
       <div style={{ marginTop: '20px' }}>
         <AccountPanel />
       </div>
+
+      <div style={{ marginTop: '20px' }}>
+        <Suspense fallback={<div>Loading telemetry…</div>}>
+          <OpsDashboard />
+        </Suspense>
+      </div>
     </div>
   );
 }
 
 function KinetraApp() {
-  // Read initial query params if present (?demo=marcus&tab=plan)
+  // Read initial query params if present (?demo=marcus&tab=plan, ?shared_token=...)
   const query = new URLSearchParams(window.location.search);
+  const sharedToken = query.get('shared_token');
   const initialTab = (query.get('tab') as NavigationTab) || 'today';
   const initialPersona = query.get('demo') === 'marcus' ? 'marcus' : 'maya';
 
@@ -161,6 +184,32 @@ function KinetraApp() {
     }
   };
 
+  if (sharedToken) {
+    return (
+      <RepositoryProvider initialPersona={initialPersona}>
+        <main>
+          <Suspense
+            fallback={
+              <div className="card" style={{ padding: '32px', textAlign: 'center' }}>
+                Loading shared routine…
+              </div>
+            }
+          >
+            <SharedPlanView
+              token={sharedToken}
+              onClose={() => {
+                const url = new URL(window.location.href);
+                url.searchParams.delete('shared_token');
+                window.history.replaceState({}, '', url.toString());
+                window.location.reload();
+              }}
+            />
+          </Suspense>
+        </main>
+      </RepositoryProvider>
+    );
+  }
+
   return (
     <RepositoryProvider initialPersona={initialPersona}>
       <main>
@@ -196,18 +245,27 @@ function KinetraApp() {
 
         <DemoHeader activeTab={activeTab} onSelectTab={setActiveTab} />
 
-        {activeTab === 'today' && <TodayView onNavigateToPlan={() => setActiveTab('plan')} />}
-        {activeTab === 'measure' && <MeasureView />}
-        {activeTab === 'plan' && <PlanView />}
-        {activeTab === 'progress' && <ProgressView />}
-        {activeTab === 'posture' && <PostureLabView />}
-        {activeTab === 'onboarding' && (
-          <OnboardingView
-            onComplete={() => setActiveTab('today')}
-            onCancel={() => setActiveTab('today')}
-          />
-        )}
-        {activeTab === 'foundation' && <FoundationPanel />}
+        <Suspense
+          fallback={
+            <div className="card" style={{ padding: '32px', textAlign: 'center' }}>
+              Loading view…
+            </div>
+          }
+        >
+          {activeTab === 'today' && <TodayView onNavigateToPlan={() => setActiveTab('plan')} />}
+          {activeTab === 'coach' && <CoachView onNavigateToTab={(tab) => setActiveTab(tab)} />}
+          {activeTab === 'measure' && <MeasureView />}
+          {activeTab === 'plan' && <PlanView />}
+          {activeTab === 'progress' && <ProgressView />}
+          {activeTab === 'posture' && <PostureLabView />}
+          {activeTab === 'onboarding' && (
+            <OnboardingView
+              onComplete={() => setActiveTab('today')}
+              onCancel={() => setActiveTab('today')}
+            />
+          )}
+          {activeTab === 'foundation' && <FoundationPanel />}
+        </Suspense>
 
         <footer>
           Verified identity · English baseline (en-US / en-GB supported) · Local synthetic

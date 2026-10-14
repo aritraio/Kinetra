@@ -2,6 +2,7 @@ import type { PlanVersionRecord, PlanWithVersion, ProgressionProposal } from '@k
 import { useCallback, useEffect, useState } from 'react';
 import { Button, Dialog, Field, Notice, SelectField, StatusBadge } from '../components/ui';
 import { useRepositories } from '../repositories';
+import { SharedPlanModal } from './SharedPlanModal';
 
 export function PlanView() {
   const repos = useRepositories();
@@ -14,6 +15,9 @@ export function PlanView() {
   const [workoutVersions, setWorkoutVersions] = useState<PlanVersionRecord[]>([]);
   const [mealVersions, setMealVersions] = useState<PlanVersionRecord[]>([]);
   const [selectedVersionNum, setSelectedVersionNum] = useState<number | null>(null);
+
+  // Sharing modal state
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   // Plan generation modal state
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
@@ -107,7 +111,7 @@ export function PlanView() {
     setGenerationSuccess(null);
 
     // Save previous active plan in case of provider failure
-    const previousPlanSnapshot = activePlan;
+    const _previousPlanSnapshot = activePlan;
 
     try {
       if (!repos.plans.generatePlan) {
@@ -243,6 +247,9 @@ export function PlanView() {
             )}
             <Button variant="primary" onClick={() => setIsGeneratorOpen(true)}>
               + Generate New Verified Plan
+            </Button>
+            <Button variant="quiet" onClick={() => setIsShareModalOpen(true)}>
+              🔗 Share Plan
             </Button>
           </div>
         </div>
@@ -861,6 +868,12 @@ export function PlanView() {
           )}
         </div>
       </Dialog>
+
+      <SharedPlanModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        plan={activePlan}
+      />
     </div>
   );
 }

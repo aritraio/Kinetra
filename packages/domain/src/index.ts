@@ -17,3 +17,6 @@ export * from './workout-verifier';
 export * from './fallback-templates';
 export * from './posture';
 export * from './progression';
+export * from './coach';
+export * from './voice';
+export * from './sharing';
